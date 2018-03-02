@@ -29,6 +29,7 @@ module.exports = function(RED) {
               debug.res = '';
               debug.payload = JSON.stringify(debug.payload).substring(0, 20);
               console.log('json file received: ', debug);
+              node.send(data.res);
         } else {
 
               console.log('input msg: ', msg);
