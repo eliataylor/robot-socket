@@ -70,7 +70,7 @@
             <option data-val="8" value="RI">RO (robot input)</option>
             <option data-val="9" value="RO">RO (robot output)</option>
             <option data-val="35" value="RO">Flag</option>
-            <option value="ALARM">ALARM</option>
+            <option value="SysVar">SysVar</option>
         </select>
     </div>
     <div class="form-row">
@@ -89,7 +89,7 @@
         category: 'config',
         defaults: {
             reg: {value:"",required:true},
-            index: {value:"",required:true,validate:RED.validators.number()}
+            index: {value:"",required:true}
         },
         label: function() {
             this.reg = this.reg || '';

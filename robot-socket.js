@@ -43,7 +43,7 @@ module.exports = function(RED) {
                 "RI" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:8}},
                 "RO" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:9}},
                 "Flag" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:35}},
-                "ALARM" : {t:'/SMONDO/SETVAR%20:index%20":value"'},
+                "SysVar" : {t:'/SMONDO/SETVAR%20:index%20":value"'},
               };
               // $UALRM_MSG[1]
 
