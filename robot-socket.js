@@ -18,9 +18,7 @@ module.exports = function(RED) {
       node.reg = config.reg;
       node.index = config.index;
 
-      //console.log('Compiled RobotSocketNode', node);
-
-      node.status({fill:"grey",shape:"dot",text:"node-red:common.status.not-connected"});
+      node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
 
       node.on('input', function(msg) {
         var data = msg;
@@ -77,8 +75,8 @@ module.exports = function(RED) {
               var req = http.request(options, function(res) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
-                  // console.log('REQ RESPONSE BODY: ' + chunk);
                   node.status({fill:"green",shape:"dot",text:"node-red:common.status.connected"});
+                  node.send(chunk);
                 });
               });
 
