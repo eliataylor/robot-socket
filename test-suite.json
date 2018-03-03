@@ -1,9 +1,9 @@
 [{
   "id": "66d062f4.0600ac",
-  "type": "robot-socket",
+  "type": "robot-socket-set",
   "z": "73c0445d.b8e98c",
   "name": "ualarm",
-  "host": "127.0.0.1:3080",
+  "host": "127.0.0.1:1880",
   "regpoint": "2d8c81b1.489eee",
   "simulated": "0",
   "x": 590,
@@ -67,10 +67,10 @@
   ]
 }, {
   "id": "cb4bcc95.7639a",
-  "type": "robot-socket",
+  "type": "robot-socket-set",
   "z": "73c0445d.b8e98c",
   "name": "string reg1",
-  "host": "127.0.0.1:3080",
+  "host": "127.0.0.1:1880",
   "regpoint": "8cff11b6.74523",
   "simulated": "0",
   "x": 630,
@@ -116,10 +116,10 @@
   ]
 }, {
   "id": "3d47e7d8.a0d6a8",
-  "type": "robot-socket",
+  "type": "robot-socket-set",
   "z": "73c0445d.b8e98c",
   "name": "string reg1",
-  "host": "127.0.0.1:3080",
+  "host": "127.0.0.1:1880",
   "regpoint": "98fe9b09.84eeb8",
   "simulated": "0",
   "x": 630,
@@ -129,10 +129,10 @@
   ]
 }, {
   "id": "6594af23.fd1db",
-  "type": "robot-socket",
+  "type": "robot-socket-set",
   "z": "73c0445d.b8e98c",
   "name": "user injected",
-  "host": "127.0.0.1:3080",
+  "host": "127.0.0.1:1880",
   "regpoint": "ce621d22.d571b",
   "simulated": "1",
   "x": 720,
@@ -208,7 +208,7 @@
   ]
 }, {
   "id": "c1cfd959.9ec9c8",
-  "type": "robot-socket",
+  "type": "robot-socket-get",
   "z": "73c0445d.b8e98c",
   "name": "robot injected",
   "host": "127.0.0.1:1880",
@@ -266,7 +266,7 @@
   "id": "2d8c81b1.489eee",
   "type": "fanuc-registry",
   "z": "",
-  "reg": "ALARM",
+  "reg": "SysVar",
   "index": "$UALRM_MSG[1]"
 }, {
   "id": "8cff11b6.74523",
