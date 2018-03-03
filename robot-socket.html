@@ -1,4 +1,5 @@
-<script type="text/x-red" data-template-name="robot-socket">
+<!-- setter -->
+<script type="text/x-red" data-template-name="robot-socket-set">
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -20,12 +21,12 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="robot-socket">
-    <p>simple configurable communication node between fanuc and node-red interface</p>
+<script type="text/x-red" data-help-name="robot-socket-set">
+    <p>sets registry keys and values for fanuc robot</p>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('robot-socket',{
+    RED.nodes.registerType('robot-socket-set',{
         category: 'FlexibleAssembly',
         color: '#0467A9',
         defaults: {
@@ -36,32 +37,56 @@
         },
         inputs:1,
         outputs:1,
-        icon: "fa.png",
+        icon: "Robot_Send2.png",
         label: function() {
-            return this.name || "robot-socket";
+            return this.name || "robot-socket-set";
+        }
+    });
+</script>
+
+<!-- getter -->
+<script type="text/x-red" data-template-name="robot-socket-get">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-host"><i class="icon-tag"></i> Hostname / IP Address:Port</label>
+        <input type="text" id="node-input-host" placeholder="host">
+    </div>
+    <div class="form-row">
+        <label for="node-input-regpoint"><i class="icon-tag"></i>Registry</label>
+        <select id="node-input-regpoint" ></select>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="robot-socket-get">
+    <p>receives getdata.stm from fanuc robot</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('robot-socket-get',{
+        category: 'FlexibleAssembly',
+        color: '#0467A9',
+        defaults: {
+            name: {value:""},
+            host: {value:"127.0.0.1:1880",required:true},
+            regpoint: {value:"",type:"fanuc-registry"}}
         },
-        oneditsave: function() {
-          /* TODO: just test editting didn't break connection
-          var node = this;
-          $.ajax('http://' + node.ip)
-          .done(function(data){
-          //  node.status({fill:"green",shape:"dot",text:"node-red:common.status.connected"});
-          })
-          .fail(function(){
-            // node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
-          });
-          */
+        inputs:1,
+        outputs:1,
+        icon: "Robot_Receive2.png",
+        label: function() {
+            return this.name || "robot-socket-get";
         }
     });
 </script>
 
 
 <!-- fanuc registry definition -->
-
-
 <script type="text/x-red" data-template-name="fanuc-registry">
     <div class="form-row">
-        <label for="node-config-input-reg"><i class="icon-tag"></i>Reg Property</label>
+        <label for="node-config-input-reg"><i class="icon-tag"></i>Registry</label>
         <select type="text" id="node-config-input-reg" >
             <option value="numreg">numreg</option>
             <option value="strreg">strreg</option>
@@ -69,18 +94,18 @@
             <option data-val="2" value="DOUT">DOUT (digital output)</option>
             <option data-val="8" value="RI">RO (robot input)</option>
             <option data-val="9" value="RO">RO (robot output)</option>
-            <option data-val="35" value="RO">Flag</option>
+            <option data-val="35" value="Flag">Flag</option> 
             <option value="SysVar">SysVar</option>
         </select>
     </div>
     <div class="form-row">
-        <label for="node-config-input-index"><i class="icon-tag"></i> Reg Index</label>
+        <label for="node-config-input-index"><i class="icon-tag"></i>Index</label>
         <input type="text" id="node-config-input-index" placeholder="index">
     </div>
 </script>
 
 <script type="text/x-red" data-help-name="fanuc-registry">
-    <p>Fanuc Registry / Index configuration options</p>
+    <p>Fanuc Registry Property/Index combinations</p>
 </script>
 
 
@@ -99,7 +124,7 @@
         oneditprepare: function() {
             $('#node-config-input-reg').change(function() {
                 var id = $( "#node-config-input-reg" ).val();
-                if (id == 'ALARM') {
+                if (id == 'SysVar') {
                   $('#node-input-simulated-block').show();
                 } else {
                   $('#node-input-simulated-block').hide();

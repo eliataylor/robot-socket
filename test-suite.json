@@ -1,0 +1,289 @@
+[{
+  "id": "66d062f4.0600ac",
+  "type": "robot-socket",
+  "z": "73c0445d.b8e98c",
+  "name": "ualarm",
+  "host": "127.0.0.1:3080",
+  "regpoint": "2d8c81b1.489eee",
+  "simulated": "0",
+  "x": 590,
+  "y": 420,
+  "wires": [
+    ["1c898520.c3c48b"]
+  ]
+}, {
+  "id": "8ee97a76.ea47c8",
+  "type": "inject",
+  "z": "73c0445d.b8e98c",
+  "name": "",
+  "topic": "",
+  "payload": "1",
+  "payloadType": "num",
+  "repeat": "",
+  "crontab": "",
+  "once": false,
+  "x": 190,
+  "y": 490,
+  "wires": [
+    ["66d062f4.0600ac"]
+  ]
+}, {
+  "id": "1c898520.c3c48b",
+  "type": "debug",
+  "z": "73c0445d.b8e98c",
+  "name": "",
+  "active": true,
+  "console": "false",
+  "complete": "false",
+  "x": 900,
+  "y": 390,
+  "wires": []
+}, {
+  "id": "4f235397.a83d8c",
+  "type": "link in",
+  "z": "73c0445d.b8e98c",
+  "name": "",
+  "links": ["2b525517.0cdc5a"],
+  "x": 375,
+  "y": 390,
+  "wires": [
+    ["66d062f4.0600ac"]
+  ]
+}, {
+  "id": "3f3c7272.1dd84e",
+  "type": "inject",
+  "z": "73c0445d.b8e98c",
+  "name": "",
+  "topic": "",
+  "payload": "0",
+  "payloadType": "num",
+  "repeat": ".5",
+  "crontab": "",
+  "once": false,
+  "x": 190,
+  "y": 430,
+  "wires": [
+    ["25809e7a.7e3d02", "de8560a5.84f99"]
+  ]
+}, {
+  "id": "cb4bcc95.7639a",
+  "type": "robot-socket",
+  "z": "73c0445d.b8e98c",
+  "name": "string reg1",
+  "host": "127.0.0.1:3080",
+  "regpoint": "8cff11b6.74523",
+  "simulated": "0",
+  "x": 630,
+  "y": 470,
+  "wires": [
+    []
+  ]
+}, {
+  "id": "25809e7a.7e3d02",
+  "type": "trigger",
+  "z": "73c0445d.b8e98c",
+  "op1": "asd",
+  "op2": "121243",
+  "op1type": "str",
+  "op2type": "str",
+  "duration": "250",
+  "extend": false,
+  "units": "ms",
+  "reset": "",
+  "name": "",
+  "x": 330,
+  "y": 430,
+  "wires": [
+    ["66d062f4.0600ac", "3d47e7d8.a0d6a8"]
+  ]
+}, {
+  "id": "de8560a5.84f99",
+  "type": "trigger",
+  "z": "73c0445d.b8e98c",
+  "op1": "12345",
+  "op2": "zzzzzzz",
+  "op1type": "str",
+  "op2type": "str",
+  "duration": "100",
+  "extend": false,
+  "units": "ms",
+  "reset": "",
+  "name": "",
+  "x": 350,
+  "y": 510,
+  "wires": [
+    ["cb4bcc95.7639a"]
+  ]
+}, {
+  "id": "3d47e7d8.a0d6a8",
+  "type": "robot-socket",
+  "z": "73c0445d.b8e98c",
+  "name": "string reg1",
+  "host": "127.0.0.1:3080",
+  "regpoint": "98fe9b09.84eeb8",
+  "simulated": "0",
+  "x": 630,
+  "y": 510,
+  "wires": [
+    []
+  ]
+}, {
+  "id": "6594af23.fd1db",
+  "type": "robot-socket",
+  "z": "73c0445d.b8e98c",
+  "name": "user injected",
+  "host": "127.0.0.1:3080",
+  "regpoint": "ce621d22.d571b",
+  "simulated": "1",
+  "x": 720,
+  "y": 710,
+  "wires": [
+    ["1fa047ca.0dadc8"]
+  ]
+}, {
+  "id": "8eef7bf4.33c178",
+  "type": "inject",
+  "z": "73c0445d.b8e98c",
+  "name": "",
+  "topic": "UI value",
+  "payload": "0",
+  "payloadType": "num",
+  "repeat": "",
+  "crontab": "",
+  "once": false,
+  "x": 390,
+  "y": 670,
+  "wires": [
+    ["6594af23.fd1db", "792a9cce.e0a134"]
+  ]
+}, {
+  "id": "1fa047ca.0dadc8",
+  "type": "debug",
+  "z": "73c0445d.b8e98c",
+  "name": "",
+  "active": true,
+  "console": true,
+  "complete": "true",
+  "x": 861,
+  "y": 710,
+  "wires": []
+}, {
+  "id": "9bad57e7.e5e728",
+  "type": "http in",
+  "z": "73c0445d.b8e98c",
+  "name": "",
+  "url": "/SMONDO/*",
+  "method": "get",
+  "upload": false,
+  "swaggerDoc": "",
+  "x": 440,
+  "y": 870,
+  "wires": [
+    ["5c65c38a.02ce6c"]
+  ]
+}, {
+  "id": "3a228e7e.343172",
+  "type": "json",
+  "z": "73c0445d.b8e98c",
+  "name": "",
+  "pretty": false,
+  "x": 782,
+  "y": 870,
+  "wires": [
+    ["c1cfd959.9ec9c8"]
+  ]
+}, {
+  "id": "5c65c38a.02ce6c",
+  "type": "file in",
+  "z": "73c0445d.b8e98c",
+  "name": "",
+  "filename": "GETDATA.json",
+  "format": "utf8",
+  "chunk": false,
+  "sendError": false,
+  "x": 630,
+  "y": 870,
+  "wires": [
+    ["3a228e7e.343172"]
+  ]
+}, {
+  "id": "c1cfd959.9ec9c8",
+  "type": "robot-socket",
+  "z": "73c0445d.b8e98c",
+  "name": "robot injected",
+  "host": "127.0.0.1:1880",
+  "regpoint": "ce621d22.d571b",
+  "simulated": "0",
+  "x": 950,
+  "y": 870,
+  "wires": [
+    []
+  ]
+}, {
+  "id": "792a9cce.e0a134",
+  "type": "debug",
+  "z": "73c0445d.b8e98c",
+  "name": "",
+  "active": true,
+  "console": true,
+  "complete": "true",
+  "x": 701,
+  "y": 670,
+  "wires": []
+}, {
+  "id": "59cacccc.939494",
+  "type": "inject",
+  "z": "73c0445d.b8e98c",
+  "name": "",
+  "topic": "UI value",
+  "payload": "1",
+  "payloadType": "num",
+  "repeat": "",
+  "crontab": "",
+  "once": false,
+  "x": 390,
+  "y": 710,
+  "wires": [
+    ["6594af23.fd1db"]
+  ]
+}, {
+  "id": "1af67394.af8b6c",
+  "type": "inject",
+  "z": "73c0445d.b8e98c",
+  "name": "",
+  "topic": "UI value",
+  "payload": "$UALRM_MSG[1]",
+  "payloadType": "str",
+  "repeat": "",
+  "crontab": "",
+  "once": false,
+  "x": 380,
+  "y": 750,
+  "wires": [
+    ["6594af23.fd1db"]
+  ]
+}, {
+  "id": "2d8c81b1.489eee",
+  "type": "fanuc-registry",
+  "z": "",
+  "reg": "ALARM",
+  "index": "$UALRM_MSG[1]"
+}, {
+  "id": "8cff11b6.74523",
+  "type": "fanuc-registry",
+  "z": "",
+  "reg": "strreg",
+  "index": "1"
+}, {
+  "id": "98fe9b09.84eeb8",
+  "type": "fanuc-registry",
+  "z": "",
+  "reg": "strreg",
+  "index": "2"
+}, {
+  "id": "ce621d22.d571b",
+  "type": "fanuc-registry",
+  "z": "",
+  "reg": "RI",
+  "index": "4"
+}]
