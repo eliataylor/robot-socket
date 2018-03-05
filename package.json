@@ -1,16 +1,12 @@
 {
     "name": "node-red-contrib-robot-socket",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "simple configurable communication node between fanuc and node-red interface",
-    "main": "robot-socket.js",
-    "scripts": {
-        "test": "test"
-    },
     "author": "Eli A Taylor for Flexible Assembly",
     "license": "UNLICENSED",
     "node-red": {
         "nodes": {
-            "robot-socket": "robot-socket.js"
+            "robot-socket": "robot-socket/robot-socket.js"
         }
     }
 }

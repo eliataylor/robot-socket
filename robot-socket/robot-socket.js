@@ -1,16 +1,27 @@
 module.exports = function(RED) {
+  "use strict";
+
+  const templates = {
+    "numreg" : {t:'/SMONDO/SETNREG%20:index%20:value'},
+    "strreg" : {t:'/SMONDO/SETSREG%20:index%20:value'},
+    "DIN" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:1}},
+    "DOUT" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:2}},
+    "RI" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:8}},
+    "RO" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:9}},
+    "Flag" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:35}},
+    "SysVar" : {t:'/SMONDO/SETVAR%20:index%20":value"'}
+  };
 
   function FanucRegistryNode(n) {
       RED.nodes.createNode(this,n);
       this.reg = n.reg;
       this.index = n.index;
   }
-  RED.nodes.registerType("fanuc-registry",FanucRegistryNode);
 
   function RobotSocketFailures(msg, node) {
     console.log(msg);
-    node.error(msg);
-    node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
+    //node.error(msg);
+    //node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
   }
 
   function RobotSocketSet(n) {
@@ -24,7 +35,7 @@ module.exports = function(RED) {
       node.reg = config.reg;
       node.index = config.index;
 
-      node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
+    //  node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
 
       node.on('input', function(msg) {
         var data = msg;
@@ -34,17 +45,6 @@ module.exports = function(RED) {
           return false;
         }
 
-
-        var templates = { // TODO: move to config or some shared global
-          "numreg" : {t:'/SMONDO/SETNREG%20:index%20:value'},
-          "strreg" : {t:'/SMONDO/SETSREG%20:index%20:value'},
-          "DIN" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:1}},
-          "DOUT" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:2}},
-          "RI" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:8}},
-          "RO" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:9}},
-          "Flag" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:35}},
-          "SysVar" : {t:'/SMONDO/SETVAR%20:index%20":value"'},
-        };
         var value = msg.payload;
         if (value == null) value = '';
 
@@ -89,7 +89,7 @@ module.exports = function(RED) {
           res.on('data', (chunk) => { rawData += chunk; });
           res.on('end', () => {
             node.send(rawData);
-            node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
+        //    node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
           });
         });
 
@@ -99,8 +99,6 @@ module.exports = function(RED) {
 
       });
   }
-
-  RED.nodes.registerType("robot-socket-set",RobotSocketSet);
 
   function handleRobotJson(rawData, node) {
     try {
@@ -134,7 +132,7 @@ module.exports = function(RED) {
       }
 
       node.send(rawData);
-      node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
+      //node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
 
     } catch (e) {
       RobotSocketFailures(e, node);
@@ -151,7 +149,7 @@ module.exports = function(RED) {
       node.reg = config.reg;
       node.index = config.index;
 
-      node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
+      //node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
 
       node.on('input', function(msg) {
 
@@ -206,8 +204,8 @@ module.exports = function(RED) {
       });
   }
 
-
+  RED.nodes.registerType("fanuc-registry",FanucRegistryNode);
+  RED.nodes.registerType("robot-socket-set",RobotSocketSet);
   RED.nodes.registerType("robot-socket-get",RobotSocketGet);
-
 
 }

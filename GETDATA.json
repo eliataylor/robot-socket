@@ -931,7 +931,7 @@
     "<!-- #echo var=REG299 -->": "<!--#echo var=DIN[299] -->",
     "<!-- #echo var=REG300 -->": "<!--#echo var=DIN[300] -->"
   },
-  "ALARM": {
+  "SysVar": {
     "<!-- #echo var=REG1 -->": "<!--#echo var=$ALM_IF.$LAST_ALM -->"
   }
 }
