@@ -77,20 +77,16 @@ module.exports = function(RED) {
 
           const { statusCode } = res;
 
-          if (statusCode !== 200) {
+          if (statusCode > 300) {
             RobotSocketFailures(`Request Failed. Status Code: ${statusCode}`, node);
             res.resume();  // consume response data to free up memory
             return;
           }
-          node.status({fill:"green",shape:"dot",text:"node-red:common.status.connected"});
-          res.setEncoding('utf8');
 
-          let rawData = '';
-          res.on('data', (chunk) => { rawData += chunk; });
-          res.on('end', () => {
-            node.send(rawData);
-            node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
-          });
+          var msg = {topic:'setrobotdata'};
+          msg.payload = {reg:node.reg, index:node.index};
+          node.send(msg);
+
         });
 
         req.on('error', function(e){
@@ -125,11 +121,11 @@ module.exports = function(RED) {
         }
       }
 
-      if (verbose > 1) {
+      if (verbose > 2) {
         console.log('warning: unaltered value at ' + key, rawData);
       }
 
-      node.send(rawData);
+      node.send({msg:rawData, topic:'robotdata'});
       node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
 
     } catch (e) {
