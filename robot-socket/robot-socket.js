@@ -125,7 +125,7 @@ module.exports = function(RED) {
         console.log('warning: unaltered value at ' + key, rawData);
       }
 
-      node.send({msg:rawData, topic:'robotdata'});
+      node.send({payload:rawData, topic:'robotdata'});
       node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
 
     } catch (e) {
