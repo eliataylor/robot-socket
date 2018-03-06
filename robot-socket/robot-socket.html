@@ -83,8 +83,7 @@
         outputs:0,
         label: function() {
             return this.reg + ': ' + this.index;
-        }
-        /*,
+        },
         oneditprepare: function() {
             $('#node-config-input-reg').change(function() {
                 if ($(this).val() == 'SysVar') {
@@ -94,28 +93,28 @@
                 }
             });
         }
-        */
     });
 
     RED.nodes.registerType('robot-socket-get',{
         category: 'FlexibleAssembly',
-        color: '#23c6ae',
+        color: '#8eed28',
         defaults: {
             name: {value:""},
             host: {value:"127.0.0.1:1880",required:true},
-            regpoint: {value:"",type:"fanuc-registry",required:true}}
+            regpoint: {value:"",type:"fanuc-registry",required:true}
         },
         inputs:1,
         outputs:1,
         icon: "Robot_Receive2.png",
         label: function() {
-            return this.name || "robot-socket-get";
+            var config =  RED.nodes.node(this.regpoint);
+            return this.name || "get " + config.reg + ":" + config.index;
         }
     });
 
     RED.nodes.registerType('robot-socket-set',{
         category: 'FlexibleAssembly',
-        color: '#0467A9',
+        color: '#33d4f4',
         defaults: {
             name: {value:""},
             host: {value:"127.0.0.1:1880",required:true},
@@ -126,7 +125,8 @@
         outputs:1,
         icon: "Robot_Send2.png",
         label: function() {
-            return this.name || "robot-socket-set";
+          var config =  RED.nodes.node(this.regpoint);
+          return this.name || "set " + config.reg + ":" + config.index;
         }
     });
 })();

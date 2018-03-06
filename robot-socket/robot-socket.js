@@ -20,8 +20,8 @@ module.exports = function(RED) {
 
   function RobotSocketFailures(msg, node) {
     console.log(msg);
-    //node.error(msg);
-    //node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
+    node.error(msg);
+    node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
   }
 
   function RobotSocketSet(n) {
@@ -35,7 +35,7 @@ module.exports = function(RED) {
       node.reg = config.reg;
       node.index = config.index;
 
-    //  node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
+      node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
 
       node.on('input', function(msg) {
         var data = msg;
@@ -89,7 +89,7 @@ module.exports = function(RED) {
           res.on('data', (chunk) => { rawData += chunk; });
           res.on('end', () => {
             node.send(rawData);
-        //    node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
+            node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
           });
         });
 
@@ -113,12 +113,12 @@ module.exports = function(RED) {
       }
       if (node.index) {
         var key = 'REG'+node.index;
-        if (typeof rawData[key] == 'object') {
+        if (typeof rawData[key] != 'undefined') {
           rawData = rawData[key];
           verbose = 2;
         } else {
           key = '<!-- #echo var='+key+' -->';
-          if (typeof rawData[key] == 'object') {
+          if (typeof rawData[key] != 'undefined') {
             rawData = rawData[key];
             verbose = 3;
           }
@@ -126,13 +126,11 @@ module.exports = function(RED) {
       }
 
       if (verbose > 1) {
-        console.log(rawData);
-      } else {
-        console.log(node.reg, node.index);
+        console.log('warning: unaltered value at ' + key, rawData);
       }
 
       node.send(rawData);
-      //node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
+      node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
 
     } catch (e) {
       RobotSocketFailures(e, node);
@@ -149,11 +147,11 @@ module.exports = function(RED) {
       node.reg = config.reg;
       node.index = config.index;
 
-      //node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
+      node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
 
       node.on('input', function(msg) {
 
-        if (msg.filename == 'getdata.stm' || msg.filename == 'GETDATA.json') {
+        if (msg.filename == 'getdata.stm') {
           console.log(msg.filename + ' passed directly ');
           return handleRobotJson(msg.payload, node);
         }
@@ -166,7 +164,6 @@ module.exports = function(RED) {
           path: '/MD/getdata.stm',
           method: 'GET'
         };
-        console.log('sending path ', options);
 
         var http = require('http');
         var req = http.get(options, function(res) {
@@ -178,10 +175,10 @@ module.exports = function(RED) {
           if (statusCode !== 200) {
             error = new Error('Request Failed.\n' +
                               `Status Code: ${statusCode}`);
-          } else if (!/^application\/json/.test(contentType)) {
-            error = new Error('Invalid content-type.\n' +
-                              `Expected application/json but received ${contentType}`);
           }
+          //else if (!/^application\/json/.test(contentType)) {
+          //  error = new Error('Invalid content-type.\n' + `Expected application/json but received ${contentType}`);
+          // }
           if (error) {
             RobotSocketFailures(error.message, node);
             res.resume();  // consume response data to free up memory
