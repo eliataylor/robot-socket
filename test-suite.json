@@ -1,87 +1,78 @@
 [{
   "id": "66d062f4.0600ac",
   "type": "robot-socket-set",
-  "z": "73c0445d.b8e98c",
-  "name": "ualarm",
+  "z": "97edaad6.17c7a8",
+  "name": "",
   "host": "127.0.0.1:1880",
   "regpoint": "2d8c81b1.489eee",
   "simulated": "0",
-  "x": 590,
-  "y": 420,
+  "x": 560,
+  "y": 100,
   "wires": [
     ["1c898520.c3c48b"]
   ]
 }, {
   "id": "8ee97a76.ea47c8",
   "type": "inject",
-  "z": "73c0445d.b8e98c",
+  "z": "97edaad6.17c7a8",
   "name": "",
   "topic": "",
-  "payload": "1",
+  "payload": "",
   "payloadType": "num",
   "repeat": "",
   "crontab": "",
   "once": false,
-  "x": 190,
-  "y": 490,
+  "onceDelay": "",
+  "x": 310,
+  "y": 40,
   "wires": [
     ["66d062f4.0600ac"]
   ]
 }, {
   "id": "1c898520.c3c48b",
   "type": "debug",
-  "z": "73c0445d.b8e98c",
+  "z": "97edaad6.17c7a8",
   "name": "",
   "active": true,
   "console": "false",
   "complete": "false",
-  "x": 900,
-  "y": 390,
+  "x": 809,
+  "y": 100,
   "wires": []
-}, {
-  "id": "4f235397.a83d8c",
-  "type": "link in",
-  "z": "73c0445d.b8e98c",
-  "name": "",
-  "links": ["2b525517.0cdc5a"],
-  "x": 375,
-  "y": 390,
-  "wires": [
-    ["66d062f4.0600ac"]
-  ]
 }, {
   "id": "3f3c7272.1dd84e",
   "type": "inject",
-  "z": "73c0445d.b8e98c",
+  "z": "97edaad6.17c7a8",
   "name": "",
   "topic": "",
-  "payload": "0",
+  "payload": "",
   "payloadType": "num",
   "repeat": ".5",
   "crontab": "",
   "once": false,
-  "x": 190,
-  "y": 430,
+  "onceDelay": "",
+  "x": 110,
+  "y": 140,
   "wires": [
     ["25809e7a.7e3d02", "de8560a5.84f99"]
   ]
 }, {
   "id": "cb4bcc95.7639a",
   "type": "robot-socket-set",
-  "z": "73c0445d.b8e98c",
-  "name": "string reg1",
+  "z": "97edaad6.17c7a8",
+  "name": "",
   "host": "127.0.0.1:1880",
   "regpoint": "8cff11b6.74523",
   "simulated": "0",
-  "x": 630,
-  "y": 470,
+  "x": 510,
+  "y": 160,
   "wires": [
     []
   ]
 }, {
   "id": "25809e7a.7e3d02",
   "type": "trigger",
-  "z": "73c0445d.b8e98c",
+  "z": "97edaad6.17c7a8",
   "op1": "asd",
   "op2": "121243",
   "op1type": "str",
@@ -91,15 +82,15 @@
   "units": "ms",
   "reset": "",
   "name": "",
-  "x": 330,
-  "y": 430,
+  "x": 280,
+  "y": 100,
   "wires": [
     ["66d062f4.0600ac", "3d47e7d8.a0d6a8"]
   ]
 }, {
   "id": "de8560a5.84f99",
   "type": "trigger",
-  "z": "73c0445d.b8e98c",
+  "z": "97edaad6.17c7a8",
   "op1": "12345",
   "op2": "zzzzzzz",
   "op1type": "str",
@@ -109,41 +100,41 @@
   "units": "ms",
   "reset": "",
   "name": "",
-  "x": 350,
-  "y": 510,
+  "x": 280,
+  "y": 160,
   "wires": [
     ["cb4bcc95.7639a"]
   ]
 }, {
   "id": "3d47e7d8.a0d6a8",
   "type": "robot-socket-set",
-  "z": "73c0445d.b8e98c",
-  "name": "string reg1",
+  "z": "97edaad6.17c7a8",
+  "name": "",
   "host": "127.0.0.1:1880",
   "regpoint": "98fe9b09.84eeb8",
   "simulated": "0",
-  "x": 630,
-  "y": 510,
+  "x": 510,
+  "y": 220,
   "wires": [
     []
   ]
 }, {
   "id": "6594af23.fd1db",
   "type": "robot-socket-set",
-  "z": "73c0445d.b8e98c",
-  "name": "user injected",
+  "z": "97edaad6.17c7a8",
+  "name": "",
   "host": "127.0.0.1:1880",
   "regpoint": "ce621d22.d571b",
   "simulated": "1",
-  "x": 720,
-  "y": 710,
+  "x": 420,
+  "y": 360,
   "wires": [
     ["1fa047ca.0dadc8"]
   ]
 }, {
   "id": "8eef7bf4.33c178",
   "type": "inject",
-  "z": "73c0445d.b8e98c",
+  "z": "97edaad6.17c7a8",
   "name": "",
   "topic": "UI value",
   "payload": "0",
@@ -151,89 +142,53 @@
   "repeat": "",
   "crontab": "",
   "once": false,
-  "x": 390,
-  "y": 670,
+  "onceDelay": "",
+  "x": 220,
+  "y": 320,
   "wires": [
-    ["6594af23.fd1db", "792a9cce.e0a134"]
+    ["6594af23.fd1db"]
   ]
 }, {
   "id": "1fa047ca.0dadc8",
   "type": "debug",
-  "z": "73c0445d.b8e98c",
+  "z": "97edaad6.17c7a8",
   "name": "",
   "active": true,
   "console": true,
   "complete": "true",
-  "x": 861,
-  "y": 710,
+  "x": 570,
+  "y": 360,
   "wires": []
 }, {
   "id": "9bad57e7.e5e728",
   "type": "http in",
-  "z": "73c0445d.b8e98c",
+  "z": "97edaad6.17c7a8",
   "name": "",
   "url": "/SMONDO/*",
   "method": "get",
   "upload": false,
   "swaggerDoc": "",
-  "x": 440,
-  "y": 870,
-  "wires": [
-    ["5c65c38a.02ce6c"]
-  ]
-}, {
-  "id": "3a228e7e.343172",
-  "type": "json",
-  "z": "73c0445d.b8e98c",
-  "name": "",
-  "pretty": false,
-  "x": 782,
-  "y": 870,
+  "x": 120,
+  "y": 549,
   "wires": [
     ["c1cfd959.9ec9c8"]
   ]
 }, {
-  "id": "5c65c38a.02ce6c",
-  "type": "file in",
-  "z": "73c0445d.b8e98c",
-  "name": "",
-  "filename": "GETDATA.json",
-  "format": "utf8",
-  "chunk": false,
-  "sendError": false,
-  "x": 630,
-  "y": 870,
-  "wires": [
-    ["3a228e7e.343172"]
-  ]
-}, {
   "id": "c1cfd959.9ec9c8",
   "type": "robot-socket-get",
-  "z": "73c0445d.b8e98c",
-  "name": "robot injected",
+  "z": "97edaad6.17c7a8",
+  "name": "",
   "host": "127.0.0.1:1880",
   "regpoint": "ce621d22.d571b",
-  "simulated": "0",
-  "x": 950,
-  "y": 870,
+  "x": 300,
+  "y": 549,
   "wires": [
     []
   ]
 }, {
-  "id": "792a9cce.e0a134",
-  "type": "debug",
-  "z": "73c0445d.b8e98c",
-  "name": "",
-  "active": true,
-  "console": true,
-  "complete": "true",
-  "x": 701,
-  "y": 670,
-  "wires": []
-}, {
   "id": "59cacccc.939494",
   "type": "inject",
-  "z": "73c0445d.b8e98c",
+  "z": "97edaad6.17c7a8",
   "name": "",
   "topic": "UI value",
   "payload": "1",
@@ -241,15 +196,15 @@
   "repeat": "",
   "crontab": "",
   "once": false,
-  "x": 390,
-  "y": 710,
+  "x": 220,
+  "y": 360,
   "wires": [
     ["6594af23.fd1db"]
   ]
 }, {
   "id": "1af67394.af8b6c",
   "type": "inject",
-  "z": "73c0445d.b8e98c",
+  "z": "97edaad6.17c7a8",
   "name": "",
   "topic": "UI value",
   "payload": "$UALRM_MSG[1]",
@@ -257,10 +212,57 @@
   "repeat": "",
   "crontab": "",
   "once": false,
-  "x": 380,
-  "y": 750,
+  "x": 170,
+  "y": 400,
   "wires": [
     ["6594af23.fd1db"]
+  ]
+}, {
+  "id": "697a9cb9.e6c044",
+  "type": "comment",
+  "z": "97edaad6.17c7a8",
+  "name": "----- use HTTP node to execute the Getter immediately after any /smondo requests are returned ---",
+  "info": "",
+  "x": 380,
+  "y": 500,
+  "wires": []
+}, {
+  "id": "972c46a6.504028",
+  "type": "robot-socket-get",
+  "z": "97edaad6.17c7a8",
+  "name": "",
+  "host": "127.0.0.1:1880",
+  "regpoint": "8cff11b6.74523",
+  "x": 290,
+  "y": 720,
+  "wires": [
+    []
+  ]
+}, {
+  "id": "490741d6.300ad",
+  "type": "comment",
+  "z": "97edaad6.17c7a8",
+  "name": "----- use inject node to execute the Getter at any interval ----",
+  "info": "",
+  "x": 260,
+  "y": 667,
+  "wires": []
+}, {
+  "id": "a1d3fdb4.54e3c",
+  "type": "inject",
+  "z": "97edaad6.17c7a8",
+  "name": "",
+  "topic": "",
+  "payload": "",
+  "payloadType": "num",
+  "repeat": ".5",
+  "crontab": "",
+  "once": false,
+  "onceDelay": "",
+  "x": 110,
+  "y": 720,
+  "wires": [
+    ["972c46a6.504028"]
   ]
 }, {
   "id": "2d8c81b1.489eee",
