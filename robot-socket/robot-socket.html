@@ -1,12 +1,28 @@
 <!-- fanuc registry definition -->
 <script type="text/x-red" data-template-name="fanuc-registry">
     <div class="form-row">
-        <label for="node-input-host"><i class="icon-tag"></i>Hostname</label>
+        <label for="node-input-host"><i class="fa fa-link" aria-hidden="true"></i> Hostname</label>
         <input type="text" id="node-input-host" placeholder="host">
     </div>
+</script>
+
+<script type="text/x-red" data-help-name="fanuc-registry">
+    <p>Fanuc Registry Hostname</p>
+</script>
+
+<!-- getter -->
+<script type="text/x-red" data-template-name="robot-socket-get">
     <div class="form-row">
-        <label for="node-config-input-reg"><i class="icon-tag"></i>Registry</label>
-        <select type="text" id="node-config-input-reg" >
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name<span data-i18n="common.label.name"></span></label>
+      <input type="text" id="node-input-name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-regpoint"><i class="fa fa-link" aria-hidden="true"></i> Host:Port</label>
+        <select id="node-input-regpoint" ></select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-reg"><i class="fa fa-outdent" aria-hidden="true"></i> Registry</label>
+        <select type="text" id="node-input-reg" >
             <option value="numreg">numreg</option>
             <option value="strreg">strreg</option>
             <option data-val="1" value="DIN">DIN (digital input)</option>
@@ -18,24 +34,8 @@
         </select>
     </div>
     <div class="form-row">
-        <label for="node-config-input-index"><i class="icon-tag"></i>Index</label>
-        <input type="text" id="node-config-input-index" placeholder="index" />
-    </div>
-</script>
-
-<script type="text/x-red" data-help-name="fanuc-registry">
-    <p>Fanuc Registry Property/Index combinations</p>
-</script>
-
-<!-- getter -->
-<script type="text/x-red" data-template-name="robot-socket-get">
-    <div class="form-row">
-      <label for="node-input-name"><i class="fa fa-tag"></i> Name<span data-i18n="common.label.name"></span></label>
-      <input type="text" id="node-input-name" />
-    </div>
-    <div class="form-row">
-        <label for="node-input-regpoint"><i class="icon-tag"></i>Registry</label>
-        <select id="node-input-regpoint" ></select>
+        <label for="node-input-index"><i class="fa fa-bullseye" aria-hidden="true"></i> Index</label>
+        <input type="text" id="node-input-index" placeholder="index" />
     </div>
 </script>
 
@@ -50,11 +50,28 @@
       <input type="text" id="node-input-name" />
     </div>
     <div class="form-row">
-        <label for="node-input-regpoint"><i class="icon-tag"></i>Registry</label>
+    <label for="node-input-regpoint"><i class="fa fa-link" aria-hidden="true"></i> Host:Port</label>
         <select id="node-input-regpoint" ></select>
     </div>
-    <div id="node-input-simulated-block" class="form-row">
-        <label for="node-input-simulated"><i class="icon-tag"></i>Simulated</label>
+    <div class="form-row">
+        <label for="node-input-reg"><i class="fa fa-registered" aria-hidden="true"></i> Registry</label>
+        <select type="text" id="node-input-reg" >
+            <option value="numreg">numreg</option>
+            <option value="strreg">strreg</option>
+            <option data-val="1" value="DIN">DIN (digital input)</option>
+            <option data-val="2" value="DOUT">DOUT (digital output)</option>
+            <option data-val="8" value="RI">RI (robot input)</option>
+            <option data-val="9" value="RO">RO (robot output)</option>
+            <option data-val="35" value="Flag">Flag</option>
+            <option value="SysVar">SysVar</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-index"><i class="fa fa-bullseye" aria-hidden="true"></i> Index</label>
+        <input type="text" id="node-input-index" placeholder="index" />
+    </div>
+    <div id="node-input-simulated-block" class="form-row" style="display:none" >
+        <label for="node-input-simulated"><i class="fa fa-clone" aria-hidden="true"></i> Simulated</label>
         <select id="node-input-simulated" >
           <option value="1">simulated</option>
           <option value="0">not simulated</option>
@@ -72,23 +89,12 @@
     RED.nodes.registerType('fanuc-registry',{
         category: 'config',
         defaults: {
-            host: {value:"127.0.0.1:1880",required:true},
-            reg: {value:"",required:true},
-            index: {value:"",required:true}
+            host: {value:"127.0.0.1:1880",required:true}
         },
         inputs:0,
         outputs:0,
         label: function() {
-            return this.reg + ': ' + this.index;
-        },
-        oneditprepare: function() {
-            $('#node-config-input-reg').change(function() {
-                if ($(this).val() == 'SysVar') {
-                  $('#node-input-simulated-block').show();
-                } else {
-                  $('#node-input-simulated-block').hide();
-                }
-            });
+            return this.host;
         }
     });
 
@@ -97,14 +103,15 @@
         color: '#8eed28',
         defaults: {
             name: {value:""},
+            reg: {value:"",required:true},
+            index: {value:"",required:true},
             regpoint: {type:"fanuc-registry",required:true}
         },
         inputs:1,
         outputs:1,
         icon: "Robot_Receive2.png",
         label: function() {
-            var config =  RED.nodes.node(this.regpoint);
-            return this.name || "get " + config.reg + ":" + config.index;
+            return this.name || "get " + this.reg + ":" + this.index;
         }
     });
 
@@ -113,15 +120,25 @@
         color: '#33d4f4',
         defaults: {
             name: {value:""},
+            reg: {value:"",required:true},
+            index: {value:"",required:true},
             regpoint: {type:"fanuc-registry",required:true},
-            simulated :{value:"notsimulated"}
+            simulated :{value:"0"}
         },
         inputs:1,
         outputs:1,
         icon: "Robot_Send2.png",
         label: function() {
-          var config =  RED.nodes.node(this.regpoint);
-          return this.name || "set " + config.reg + ":" + config.index;
+          return this.name || "set " + this.reg + ":" + this.index;
+        },
+        oneditprepare: function() {
+          $('#node-input-reg').change(function() {
+              if ($(this).val() == 'SysVar') {
+                $('#node-input-simulated-block').show();
+              } else {
+                $('#node-input-simulated-block').hide();
+              }
+          });
         }
     });
 })();

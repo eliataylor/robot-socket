@@ -14,8 +14,6 @@ module.exports = function(RED) {
 
   function FanucRegistryNode(n) {
       RED.nodes.createNode(this,n);
-      this.reg = n.reg;
-      this.index = n.index;
       this.host = n.host;
   }
 
@@ -30,10 +28,10 @@ module.exports = function(RED) {
       var node = this;
       node.name = n.name;
       node.simulated = n.simulated;
+      node.reg = n.reg;
+      node.index = n.index;
 
       var config =  RED.nodes.getNode(n.regpoint);
-      node.reg = config.reg;
-      node.index = config.index;
       node.host = config.host;
 
       node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
@@ -46,13 +44,13 @@ module.exports = function(RED) {
           return false;
         }
 
-        var value = msg.payload;
+        var value = data.payload;
         if (value == null) value = '';
 
         var runtimes = {
           'index' : node.index,
           'simulated' : node.simulated,
-          'value' : msg.payload
+          'value' : value
         }
 
         if (typeof templates[node.reg] == 'undefined') {
@@ -83,7 +81,7 @@ module.exports = function(RED) {
             return;
           }
 
-          var msg = {topic:'setrobotdata'};
+          msg = {topic:'setrobotdata'};
           msg.payload = {reg:node.reg, index:node.index};
           node.send(msg);
 
@@ -137,10 +135,10 @@ module.exports = function(RED) {
       RED.nodes.createNode(this,n);
       var node = this;
       node.name = n.name;
+      node.reg = n.reg;
+      node.index = n.index;
 
       var config =  RED.nodes.getNode(n.regpoint);
-      node.reg = config.reg;
-      node.index = config.index;
       node.host = config.host;
 
       node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
