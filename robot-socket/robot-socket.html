@@ -30,8 +30,8 @@
 <!-- getter -->
 <script type="text/x-red" data-template-name="robot-socket-get">
     <div class="form-row">
-    <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
-    <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name<span data-i18n="common.label.name"></span></label>
+      <input type="text" id="node-input-name" />
     </div>
     <div class="form-row">
         <label for="node-input-regpoint"><i class="icon-tag"></i>Registry</label>
@@ -46,8 +46,8 @@
 <!-- setter -->
 <script type="text/x-red" data-template-name="robot-socket-set">
     <div class="form-row">
-    <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
-    <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name<span data-i18n="common.label.name"></span></label>
+      <input type="text" id="node-input-name" />
     </div>
     <div class="form-row">
         <label for="node-input-regpoint"><i class="icon-tag"></i>Registry</label>
@@ -97,7 +97,7 @@
         color: '#8eed28',
         defaults: {
             name: {value:""},
-            regpoint: {value:"",type:"fanuc-registry",required:true}
+            regpoint: {type:"fanuc-registry",required:true}
         },
         inputs:1,
         outputs:1,
@@ -113,7 +113,7 @@
         color: '#33d4f4',
         defaults: {
             name: {value:""},
-            regpoint: {value:"",type:"fanuc-registry",required:true},
+            regpoint: {type:"fanuc-registry",required:true},
             simulated :{value:"notsimulated"}
         },
         inputs:1,

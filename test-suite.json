@@ -3,7 +3,6 @@
   "type": "robot-socket-set",
   "z": "97edaad6.17c7a8",
   "name": "",
-  "host": "127.0.0.1:1880",
   "regpoint": "2d8c81b1.489eee",
   "simulated": "0",
   "x": 560,
@@ -61,7 +60,6 @@
   "type": "robot-socket-set",
   "z": "97edaad6.17c7a8",
   "name": "",
-  "host": "127.0.0.1:1880",
   "regpoint": "8cff11b6.74523",
   "simulated": "0",
   "x": 510,
@@ -110,7 +108,6 @@
   "type": "robot-socket-set",
   "z": "97edaad6.17c7a8",
   "name": "",
-  "host": "127.0.0.1:1880",
   "regpoint": "98fe9b09.84eeb8",
   "simulated": "0",
   "x": 510,
@@ -123,7 +120,6 @@
   "type": "robot-socket-set",
   "z": "97edaad6.17c7a8",
   "name": "",
-  "host": "127.0.0.1:1880",
   "regpoint": "ce621d22.d571b",
   "simulated": "1",
   "x": 420,
@@ -178,7 +174,6 @@
   "type": "robot-socket-get",
   "z": "97edaad6.17c7a8",
   "name": "",
-  "host": "127.0.0.1:1880",
   "regpoint": "ce621d22.d571b",
   "x": 300,
   "y": 549,
@@ -231,7 +226,6 @@
   "type": "robot-socket-get",
   "z": "97edaad6.17c7a8",
   "name": "",
-  "host": "127.0.0.1:1880",
   "regpoint": "8cff11b6.74523",
   "x": 290,
   "y": 720,
@@ -268,24 +262,28 @@
   "id": "2d8c81b1.489eee",
   "type": "fanuc-registry",
   "z": "",
+  "host": "127.0.0.1:1880",
   "reg": "SysVar",
   "index": "$UALRM_MSG[1]"
 }, {
   "id": "8cff11b6.74523",
   "type": "fanuc-registry",
   "z": "",
+  "host": "127.0.0.1:1880",
   "reg": "strreg",
   "index": "1"
 }, {
   "id": "98fe9b09.84eeb8",
   "type": "fanuc-registry",
   "z": "",
+  "host": "127.0.0.1:1880",
   "reg": "strreg",
   "index": "2"
 }, {
   "id": "ce621d22.d571b",
   "type": "fanuc-registry",
   "z": "",
+  "host": "127.0.0.1:1880",
   "reg": "RI",
   "index": "4"
 }]

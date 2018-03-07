@@ -52,7 +52,7 @@ module.exports = function(RED) {
         var runtimes = {
           'index' : node.index,
           'simulated' : node.simulated,
-          'value' : msg.payload,
+          'value' : msg.payload
         }
 
         if (typeof templates[node.reg] == 'undefined') {
@@ -71,7 +71,7 @@ module.exports = function(RED) {
         var parts = node.host.split(':');
         if (parts.length == 1) parts[1] = '1880';
         var options = {host:parts[0], port: parseInt(parts[1]), path: path};
-        console.log('sending path ', options);
+        //console.log('sending path ', options);
 
         var http = require('http');
         var req = http.get(options, function(res) {
