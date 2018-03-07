@@ -16,6 +16,7 @@ module.exports = function(RED) {
       RED.nodes.createNode(this,n);
       this.reg = n.reg;
       this.index = n.index;
+      this.host = n.host;
   }
 
   function RobotSocketFailures(msg, node) {
