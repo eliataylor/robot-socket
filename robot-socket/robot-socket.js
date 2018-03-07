@@ -28,12 +28,12 @@ module.exports = function(RED) {
       RED.nodes.createNode(this,n);
       var node = this;
       node.name = n.name;
-      node.host = n.host;
       node.simulated = n.simulated;
 
       var config =  RED.nodes.getNode(n.regpoint);
       node.reg = config.reg;
       node.index = config.index;
+      node.host = config.host;
 
       node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
 
@@ -76,7 +76,6 @@ module.exports = function(RED) {
         var req = http.get(options, function(res) {
 
           const { statusCode } = res;
-
           if (statusCode > 300) {
             RobotSocketFailures(`Request Failed. Status Code: ${statusCode}`, node);
             res.resume();  // consume response data to free up memory
@@ -137,11 +136,11 @@ module.exports = function(RED) {
       RED.nodes.createNode(this,n);
       var node = this;
       node.name = n.name;
-      node.host = n.host;
 
       var config =  RED.nodes.getNode(n.regpoint);
       node.reg = config.reg;
       node.index = config.index;
+      node.host = config.host;
 
       node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
 
@@ -165,18 +164,8 @@ module.exports = function(RED) {
         var req = http.get(options, function(res) {
 
           const { statusCode } = res;
-          const contentType = res.headers['content-type'];
-
-          let error;
-          if (statusCode !== 200) {
-            error = new Error('Request Failed.\n' +
-                              `Status Code: ${statusCode}`);
-          }
-          //else if (!/^application\/json/.test(contentType)) {
-          //  error = new Error('Invalid content-type.\n' + `Expected application/json but received ${contentType}`);
-          // }
-          if (error) {
-            RobotSocketFailures(error.message, node);
+          if (statusCode > 300) {
+            RobotSocketFailures(`Request Failed. Status Code: ${statusCode}`, node);
             res.resume();  // consume response data to free up memory
             return;
           }

@@ -1,6 +1,10 @@
 <!-- fanuc registry definition -->
 <script type="text/x-red" data-template-name="fanuc-registry">
     <div class="form-row">
+        <label for="node-input-host"><i class="icon-tag"></i>Hostname</label>
+        <input type="text" id="node-input-host" placeholder="host">
+    </div>
+    <div class="form-row">
         <label for="node-config-input-reg"><i class="icon-tag"></i>Registry</label>
         <select type="text" id="node-config-input-reg" >
             <option value="numreg">numreg</option>
@@ -30,10 +34,6 @@
     <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
     </div>
     <div class="form-row">
-        <label for="node-input-host"><i class="icon-tag"></i> Hostname / IP Address:Port</label>
-        <input type="text" id="node-input-host" placeholder="host">
-    </div>
-    <div class="form-row">
         <label for="node-input-regpoint"><i class="icon-tag"></i>Registry</label>
         <select id="node-input-regpoint" ></select>
     </div>
@@ -48,10 +48,6 @@
     <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
     <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
-    </div>
-    <div class="form-row">
-        <label for="node-input-host"><i class="icon-tag"></i> Hostname / IP Address:Port</label>
-        <input type="text" id="node-input-host" placeholder="host">
     </div>
     <div class="form-row">
         <label for="node-input-regpoint"><i class="icon-tag"></i>Registry</label>
@@ -76,6 +72,7 @@
     RED.nodes.registerType('fanuc-registry',{
         category: 'config',
         defaults: {
+            host: {value:"127.0.0.1:1880",required:true},
             reg: {value:"",required:true},
             index: {value:"",required:true}
         },
@@ -100,7 +97,6 @@
         color: '#8eed28',
         defaults: {
             name: {value:""},
-            host: {value:"127.0.0.1:1880",required:true},
             regpoint: {value:"",type:"fanuc-registry",required:true}
         },
         inputs:1,
@@ -117,9 +113,8 @@
         color: '#33d4f4',
         defaults: {
             name: {value:""},
-            host: {value:"127.0.0.1:1880",required:true},
             regpoint: {value:"",type:"fanuc-registry",required:true},
-            simulated :{value:""}
+            simulated :{value:"notsimulated"}
         },
         inputs:1,
         outputs:1,
