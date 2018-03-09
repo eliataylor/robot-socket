@@ -18,6 +18,7 @@ module.exports = function(RED) {
   }
 
   function RobotSocketFailures(msg, node) {
+    // TODO: improve error handling with a 'verbose' flag better control message tracing
     console.log(msg);
     node.error(msg);
     node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
@@ -47,23 +48,24 @@ module.exports = function(RED) {
         var value = data.payload;
         if (value == null) value = '';
 
-        var runtimes = {
-          'index' : node.index,
-          'simulated' : node.simulated,
-          'value' : value
-        }
-
         if (typeof templates[node.reg] == 'undefined') {
           return RobotSocketFailures('illegal registry: ' + node.reg, node);
         }
-        var obj = templates[node.reg];
+
+        var obj = templates[node.reg]; // these are not dynamic variables and do not change are runtime (via inject / timestamps / http responses ... )
         var path = obj.t;
         for(var i in obj.inject) {
           var regex = new RegExp(":"+i, 'g');
           path = path.replace(regex, obj.inject[i]);
         }
+
+        var runtimes = {
+          'index' : node.index,
+          'simulated' : node.simulated,
+          'value' : value
+        }
         for(var i in runtimes) {
-          var regex = new RegExp(":"+i, 'g');
+          var regex = new RegExp(":"+i, 'g'); // replaces ALL occurances of : plus the runtime/template key
           path = path.replace(regex, runtimes[i]);
         }
         var parts = node.host.split(':');
@@ -76,12 +78,14 @@ module.exports = function(RED) {
 
           const { statusCode } = res;
           if (statusCode > 300) {
+            // usually the robot replies with 'no content' > 204
+            // TODO: set robot to reply with reg.index value
             RobotSocketFailures(`Request Failed. Status Code: ${statusCode}`, node);
             res.resume();  // consume response data to free up memory
             return;
           }
 
-          msg = {topic:'setrobotdata'};
+          msg = {topic:'setrobotdata'}; // arbitrary topic
           msg.payload = {reg:node.reg, index:node.index};
           node.send(msg);
 
@@ -108,10 +112,10 @@ module.exports = function(RED) {
       if (node.index) {
         var key = 'REG'+node.index;
         if (typeof rawData[key] != 'undefined') {
-          rawData = rawData[key];
+          rawData = rawData[key]; // I DON'T THINK THIS SHOULD HAPPEN ON PRODUCTION (but don't fully know how getdata.stm is rewritten)
           verbose = 2;
         } else {
-          key = '<!-- #echo var='+key+' -->';
+          key = '<!-- #echo var='+key+' -->'; // SHOULD NEVER HAPPEN ON PRODUCTION!
           if (typeof rawData[key] != 'undefined') {
             rawData = rawData[key];
             verbose = 3;
@@ -120,10 +124,11 @@ module.exports = function(RED) {
       }
 
       if (verbose > 2) {
+        // this would implies getdata.stm was no rewritten properly by the robot
         console.log('warning: unaltered value at ' + key, rawData);
       }
 
-      node.send({payload:rawData, topic:'robotdata'});
+      node.send({payload:rawData, topic:'robotdata'}); // arbitrary topic
       node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
 
     } catch (e) {
@@ -146,12 +151,12 @@ module.exports = function(RED) {
       node.on('input', function(msg) {
 
         if (msg.filename == 'getdata.stm') {
-          console.log(msg.filename + ' passed directly ');
+          console.log(msg.filename + ' passed directly '); // this is just for testing and retrieving the base getdata.stm file
           return handleRobotJson(msg.payload, node);
         }
 
         var parts = node.host.split(':');
-        if (parts.length == 1) parts[1] = '1880';
+        if (parts.length == 1) parts[1] = '1880'; // this is just for my own testing without a robot
         var options = {
           host:parts[0],
           port: parseInt(parts[1]),

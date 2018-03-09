@@ -132,8 +132,9 @@
           return this.name || "set " + this.reg + ":" + this.index;
         },
         oneditprepare: function() {
+          // conditional logic to toggle Simulated field for the reg selection
           $('#node-input-reg').change(function() {
-              if ($(this).val() == 'SysVar') {
+              if ($.inArray($(this).val(), array('RO','RI','DO','DI')) {
                 $('#node-input-simulated-block').show();
               } else {
                 $('#node-input-simulated-block').hide();
