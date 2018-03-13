@@ -21,8 +21,7 @@ module.exports = function(RED) {
   }
 
   function RobotSocketFailures(msg, node) {
-    // TODO: improve error handling with a 'verbose' flag better control message tracing
-    console.log(msg);
+    // TODO: use RED.settings.logging.console.level to control debug / error messages
     node.error(msg);
     node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
   }
@@ -44,7 +43,7 @@ module.exports = function(RED) {
         var data = msg;
         if (typeof data == 'string') data = JSON.parse(msg);
         if (typeof msg.payload == 'object') {
-          console.log('invalid set value');
+          node.error('invalid set value');
           return false;
         }
 
@@ -74,7 +73,7 @@ module.exports = function(RED) {
         var parts = node.host.split(':');
         if (parts.length == 1) parts[1] = '1880';
         var options = {host:parts[0], port: parseInt(parts[1]), path: path};
-        if (RED.settings.logging.console.level == 'debug') console.log('setter path ', options);
+        node.warn('setter path ', options);
 
         var req = http.get(options, function(res) {
 
@@ -87,9 +86,12 @@ module.exports = function(RED) {
             return;
           }
 
-          msg = {topic:'setrobotdata'}; // arbitrary topic
-          msg.payload = {reg:node.reg, index:node.index};
-          node.send(msg);
+          // warn: unhandled response
+          res.on('end', () => {
+            msg = {topic:'setrobotdata'}; // arbitrary topic
+            msg.payload = {reg:node.reg, index:node.index};
+            node.send(msg);
+          });
 
         });
 
@@ -103,31 +105,21 @@ module.exports = function(RED) {
   function handleRobotJson(rawData, node) {
     try {
       if (typeof rawData != 'object') {
+        console.log('extra parsing ' + typeof rawData);
         rawData = JSON.parse(rawData);
       }
 
-      var verbose = 0;
-      if (node.reg && typeof rawData[node.reg] == 'object') {
+      if (typeof rawData[node.reg] != 'undefined') {
         rawData = rawData[node.reg];
-        verbose = 1;
-      }
-      if (node.index) {
         var key = 'REG'+node.index;
         if (typeof rawData[key] != 'undefined') {
-          rawData = rawData[key]; // I DON'T THINK THIS SHOULD HAPPEN ON PRODUCTION (but don't fully know how getdata.stm is rewritten)
-          verbose = 2;
+          rawData = rawData[key];
+          node.log('parsed json: ' + node.reg + ' - ' + key + ' == ' + rawData);
         } else {
-          key = '<!-- #echo var='+key+' -->'; // SHOULD NEVER HAPPEN ON PRODUCTION!
-          if (typeof rawData[key] != 'undefined') {
-            rawData = rawData[key];
-            verbose = 3;
-          }
+          node.error('json missing registry/index: ' + node.reg + ' / ' + key);  // will the robot ever send something back like this?
         }
-      }
-
-      if (verbose > 2) {
-        // this would implies getdata.stm was no rewritten properly by the robot
-        console.log('warning: unaltered value at ' + key, rawData);
+      } else {
+        node.error('json missing registry: ' + node.reg); // will the robot ever send something back like this?
       }
 
       node.send({payload:rawData, topic:'robotdata'}); // arbitrary topic
@@ -153,7 +145,7 @@ module.exports = function(RED) {
       node.on('input', function(msg) {
 
         if (msg.filename == 'getdata.stm' || msg.filename == 'getdata.json') {
-          console.log(msg.filename + ' passed directly '); // this shoud never happen on productio. it's just for testing and retrieving the base getdata.stm file
+          node.warn(msg.filename + ' passed directly '); // this shoud never happen on productio. it's just for testing and retrieving the base getdata.stm file
           return handleRobotJson(msg.payload, node);
         }
 
@@ -161,9 +153,10 @@ module.exports = function(RED) {
         if (parts.length == 1) parts[1] = '1880'; // this is just for my own testing without a robot
 
         if (parts[0] == 'localhost' || parts[0] == '127.0.0.1') { // any getter nodes pointing a localhost load the static file if it exists
-          fs.readFile('getdata.json', (err, rawData) => {
+          fs.readFile('getdata.json', "utf8", (err, rawData) => {
+//          fs.readFile('getdata.json', {encoding:"utf8"}, (err, rawData) => {
             if (err) {
-              return console.log('getdata.json do not exist yet'); // make sure you have at least one getter loading from the robot IP
+              return node.warn('getdata.json do not exist yet'); // make sure you have at least one getter loading from the robot IP
             }
             // retrieved static data file
             handleRobotJson(rawData, node);
@@ -178,6 +171,7 @@ module.exports = function(RED) {
           path: '/MD/getdata.stm',
           method: 'GET'
         };
+        node.log('getter path ', options);
 
         var req = http.get(options, function(res) {
 
@@ -194,19 +188,21 @@ module.exports = function(RED) {
           let rawData = '';
           res.on('data', (chunk) => { rawData += chunk; });
           res.on('end', () => {
-            handleRobotJson(rawData, node);
             // WARN: i'm a bit worried about too many nodes writing at once.
             fs.writeFile('getdata.json', rawData, { flag: 'w' }, (err) => {
               if (err) {
                 throw err;
-                return console.log('filewriter failed: getdata.json');
+                return node.error('filewriter failed: getdata.json');
+              } else {
+                node.log('getdata.json saved');
               }
             });
-
-/*            arr.reduce((chain, str) => {
-              return chain
-               .then(() => writeToFilePromise(str));
-            }, Promise.resolve()); */
+            try {
+              rawData = JSON.parse(rawData);
+            } catch (e) {
+              return node.error(e.message);
+            }
+            handleRobotJson(rawData, node);
 
           });
         });

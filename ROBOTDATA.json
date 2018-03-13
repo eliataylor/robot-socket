@@ -938,13 +938,15 @@
     "REG1": "OFF",
     "REG2": "OFF",
     "REG3": "OFF",
-    "REG4": "OFF"
+    "REG4": "OFF",
+    "REG5": "ON"
   },
   "RO": {
     "REG1": "OFF",
     "REG2": "OFF",
     "REG3": "OFF",
-    "REG4": "OFF"
+    "REG4": "OFF",
+    "REG5": "ON"
   },
   "Flag": {
     "REG1": "OFF",
