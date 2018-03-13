@@ -1,6 +1,9 @@
 module.exports = function(RED) {
   "use strict";
 
+  const fs = require("fs");
+  const http = require('http');
+
   const templates = {
     "numreg" : {t:'/SMONDO/SETNREG%20:index%20:value'},
     "strreg" : {t:'/SMONDO/SETSREG%20:index%20:value'},
@@ -35,7 +38,7 @@ module.exports = function(RED) {
       var config =  RED.nodes.getNode(n.regpoint);
       node.host = config.host;
 
-      node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
+      // node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
 
       node.on('input', function(msg) {
         var data = msg;
@@ -71,16 +74,15 @@ module.exports = function(RED) {
         var parts = node.host.split(':');
         if (parts.length == 1) parts[1] = '1880';
         var options = {host:parts[0], port: parseInt(parts[1]), path: path};
-        //console.log('sending path ', options);
+        if (RED.settings.logging.console.level == 'debug') console.log('setter path ', options);
 
-        var http = require('http');
         var req = http.get(options, function(res) {
 
           const { statusCode } = res;
           if (statusCode > 300) {
             // usually the robot replies with 'no content' > 204
             // TODO: set robot to reply with reg.index value
-            RobotSocketFailures(`Request Failed. Status Code: ${statusCode}`, node);
+            RobotSocketFailures(`Request Failed. Status Code: ${statusCode} ${options.path}`, node);
             res.resume();  // consume response data to free up memory
             return;
           }
@@ -129,7 +131,7 @@ module.exports = function(RED) {
       }
 
       node.send({payload:rawData, topic:'robotdata'}); // arbitrary topic
-      node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
+      // node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
 
     } catch (e) {
       RobotSocketFailures(e, node);
@@ -146,17 +148,30 @@ module.exports = function(RED) {
       var config =  RED.nodes.getNode(n.regpoint);
       node.host = config.host;
 
-      node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
+      // node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
 
       node.on('input', function(msg) {
 
-        if (msg.filename == 'getdata.stm') {
-          console.log(msg.filename + ' passed directly '); // this is just for testing and retrieving the base getdata.stm file
+        if (msg.filename == 'getdata.stm' || msg.filename == 'getdata.json') {
+          console.log(msg.filename + ' passed directly '); // this shoud never happen on productio. it's just for testing and retrieving the base getdata.stm file
           return handleRobotJson(msg.payload, node);
         }
 
         var parts = node.host.split(':');
         if (parts.length == 1) parts[1] = '1880'; // this is just for my own testing without a robot
+
+        if (parts[0] == 'localhost' || parts[0] == '127.0.0.1') { // any getter nodes pointing a localhost load the static file if it exists
+          fs.readFile('getdata.json', (err, rawData) => {
+            if (err) {
+              return console.log('getdata.json do not exist yet'); // make sure you have at least one getter loading from the robot IP
+            }
+            // retrieved static data file
+            handleRobotJson(rawData, node);
+          });
+          return;
+        }
+
+        // below is only for nodes loading from the robot IP
         var options = {
           host:parts[0],
           port: parseInt(parts[1]),
@@ -164,23 +179,35 @@ module.exports = function(RED) {
           method: 'GET'
         };
 
-        var http = require('http');
         var req = http.get(options, function(res) {
 
           const { statusCode } = res;
           if (statusCode > 300) {
-            RobotSocketFailures(`Request Failed. Status Code: ${statusCode}`, node);
+            RobotSocketFailures(`Request Failed. Status Code: ${statusCode} ${options.path}`, node);
             res.resume();  // consume response data to free up memory
             return;
           }
 
-          node.status({fill:"green",shape:"dot",text:"node-red:common.status.connected"});
+          node.status({fill:"green",shape:"dot",text:"node-red:common.status.connected"}); // show the one node that is pooling the robot
           res.setEncoding('utf8');
 
           let rawData = '';
           res.on('data', (chunk) => { rawData += chunk; });
           res.on('end', () => {
             handleRobotJson(rawData, node);
+            // WARN: i'm a bit worried about too many nodes writing at once.
+            fs.writeFile('getdata.json', rawData, { flag: 'w' }, (err) => {
+              if (err) {
+                throw err;
+                return console.log('filewriter failed: getdata.json');
+              }
+            });
+
+/*            arr.reduce((chain, str) => {
+              return chain
+               .then(() => writeToFilePromise(str));
+            }, Promise.resolve()); */
+
           });
         });
 
@@ -188,6 +215,15 @@ module.exports = function(RED) {
           RobotSocketFailures(e,node);
         });
       });
+  }
+
+  function writeToFilePromise(str) {
+    return new Promise((resolve, reject) => {
+      fs.write("getdata.json", str, {flag: "x"}, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
   }
 
   RED.nodes.registerType("fanuc-registry",FanucRegistryNode);
