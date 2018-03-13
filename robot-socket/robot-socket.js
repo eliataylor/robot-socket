@@ -73,7 +73,7 @@ module.exports = function(RED) {
         var parts = node.host.split(':');
         if (parts.length == 1) parts[1] = '1880';
         var options = {host:parts[0], port: parseInt(parts[1]), path: path};
-        node.warn('setter path ', options);
+        node.warn('setter path: ' + options.path);
 
         var req = http.get(options, function(res) {
 
@@ -171,7 +171,7 @@ module.exports = function(RED) {
           path: '/MD/getdata.stm',
           method: 'GET'
         };
-        node.log('getter path ', options);
+        node.log('getter path: ' + options.path);
 
         var req = http.get(options, function(res) {
 
