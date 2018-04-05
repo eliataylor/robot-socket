@@ -1524,7 +1524,7 @@
   ]
 }, {
   "id": "99e67073.a847c",
-  "type": "robot-socket-get",
+  "type": "robot-socket-get", "source" : "file",
   "z": "b73331c3.9d088",
   "name": "",
   "reg": "numreg",
@@ -1537,7 +1537,7 @@
   ]
 }, {
   "id": "a28333b1.844f3",
-  "type": "robot-socket-get",
+  "type": "robot-socket-get", "source" : "file",
   "z": "b73331c3.9d088",
   "name": "",
   "reg": "numreg",
@@ -1550,7 +1550,7 @@
   ]
 }, {
   "id": "ea4eb9bf.687b48",
-  "type": "robot-socket-get",
+  "type": "robot-socket-get", "source" : "file",
   "z": "b73331c3.9d088",
   "name": "",
   "reg": "SysVar",
@@ -1563,7 +1563,7 @@
   ]
 }, {
   "id": "9e18088f.695668",
-  "type": "robot-socket-get",
+  "type": "robot-socket-get", "source" : "file",
   "z": "b73331c3.9d088",
   "name": "",
   "reg": "strreg",
@@ -1576,7 +1576,7 @@
   ]
 }, {
   "id": "dfad3621.4c9b78",
-  "type": "robot-socket-get",
+  "type": "robot-socket-get", "source" : "file",
   "z": "b73331c3.9d088",
   "name": "",
   "reg": "numreg",
@@ -1589,7 +1589,7 @@
   ]
 }, {
   "id": "5a5c0b4b.43a654",
-  "type": "robot-socket-get",
+  "type": "robot-socket-get", "source" : "file",
   "z": "b73331c3.9d088",
   "name": "",
   "reg": "numreg",
@@ -1602,7 +1602,7 @@
   ]
 }, {
   "id": "7ca02404.6280ec",
-  "type": "robot-socket-get",
+  "type": "robot-socket-get", "source" : "file",
   "z": "b73331c3.9d088",
   "name": "",
   "reg": "strreg",
@@ -1630,7 +1630,7 @@
   "wires": []
 }, {
   "id": "e873930c.4d0df",
-  "type": "robot-socket-get",
+  "type": "robot-socket-get", "source" : "file",
   "z": "b73331c3.9d088",
   "name": "",
   "reg": "numreg",
@@ -1643,7 +1643,7 @@
   ]
 }, {
   "id": "dabb7450.cf0338",
-  "type": "robot-socket-get",
+  "type": "robot-socket-get", "source" : "file",
   "z": "b73331c3.9d088",
   "name": "",
   "reg": "numreg",
@@ -2325,7 +2325,7 @@
   ]
 }, {
   "id": "f6e1ee56.1da79",
-  "type": "robot-socket-get",
+  "type": "robot-socket-get", "source" : "file",
   "z": "b73331c3.9d088",
   "name": "",
   "reg": "strreg",

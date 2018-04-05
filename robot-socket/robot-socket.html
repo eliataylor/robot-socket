@@ -17,8 +17,15 @@
       <input type="text" id="node-input-name" />
     </div>
     <div class="form-row">
-        <label for="node-input-regpoint"><i class="fa fa-link" aria-hidden="true"></i> Host:Port</label>
+        <label for="node-input-regpoint"><i class="fa fa-link" aria-hidden="true"></i>Host:Port</label>
         <select id="node-input-regpoint" ></select>
+    </div>
+    <div class="form-row">
+        <label class="form-check-label" for="node-input-source">Source</label>
+        <select id="node-input-source" >
+          <option value="http" selected="selected" >HTTP request to remote robot</option>
+          <option value="file">Local copy of robot response</option>
+        </select>
     </div>
     <div class="form-row">
         <label for="node-input-reg"><i class="fa fa-outdent" aria-hidden="true"></i> Registry</label>
@@ -105,13 +112,14 @@
             name: {value:""},
             reg: {value:"",required:true},
             index: {value:"",required:true},
+            source: {value:"http"},
             regpoint: {type:"fanuc-registry",required:true}
         },
         inputs:1,
         outputs:1,
         icon: "Robot_Receive2.png",
         label: function() {
-            return this.name || "get " + this.reg + ":" + this.index;
+            return this.name || this.source + " " + this.reg + ":" + this.index;
         }
     });
 

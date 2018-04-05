@@ -68,7 +68,7 @@ module.exports = function(RED) {
         }
         for(var i in runtimes) {
           var regex = new RegExp(":"+i, 'g'); // replaces ALL occurances of : plus the runtime/template key
-          path = path.replace(regex, runtimes[i]);
+          path = path.replace(regex, encodeURIComponent(runtimes[i]));
         }
         var parts = node.host.split(':');
         if (parts.length == 1) parts[1] = '1880';
@@ -105,7 +105,6 @@ module.exports = function(RED) {
   function handleRobotJson(rawData, node) {
     try {
       if (typeof rawData != 'object') {
-        console.log('extra parsing ' + typeof rawData);
         rawData = JSON.parse(rawData);
       }
 
@@ -136,6 +135,7 @@ module.exports = function(RED) {
       node.name = n.name;
       node.reg = n.reg;
       node.index = n.index;
+      node.source = n.source;
 
       var config =  RED.nodes.getNode(n.regpoint);
       node.host = config.host;
@@ -144,7 +144,7 @@ module.exports = function(RED) {
 
       node.on('input', function(msg) {
 
-        if (msg.filename == 'getdata.stm' || msg.filename == 'getdata.json') {
+        if (msg.filename == 'getdata.stm' || msg.filename == 'getdata.json' || msg.filename == node.host + '.json') {
           node.warn(msg.filename + ' passed directly '); // this shoud never happen on productio. it's just for testing and retrieving the base getdata.stm file
           return handleRobotJson(msg.payload, node);
         }
@@ -152,11 +152,11 @@ module.exports = function(RED) {
         var parts = node.host.split(':');
         if (parts.length == 1) parts[1] = '1880'; // this is just for my own testing without a robot
 
-        if (parts[0] == 'localhost' || parts[0] == '127.0.0.1') { // any getter nodes pointing a localhost load the static file if it exists
-          fs.readFile('getdata.json', "utf8", (err, rawData) => {
-//          fs.readFile('getdata.json', {encoding:"utf8"}, (err, rawData) => {
+        if (node.source == 'file') { // any getter nodes pointing a localhost load the static file if it exists
+
+          fs.readFile(node.host + '.json', "utf8", (err, rawData) => {
             if (err) {
-              return node.warn('getdata.json do not exist yet'); // make sure you have at least one getter loading from the robot IP
+              return node.warn(node.host + '.json do not exist yet'); // make sure you have at least one getter loading from the robot IP
             }
             // retrieved static data file
             handleRobotJson(rawData, node);
@@ -189,12 +189,12 @@ module.exports = function(RED) {
           res.on('data', (chunk) => { rawData += chunk; });
           res.on('end', () => {
             // WARN: i'm a bit worried about too many nodes writing at once.
-            fs.writeFile('getdata.json', rawData, { flag: 'w' }, (err) => {
+            fs.writeFile(node.host + '.json', rawData, { flag: 'w' }, (err) => {
               if (err) {
                 throw err;
-                return node.error('filewriter failed: getdata.json');
+                return node.error('filewriter failed: '+node.host+'.json');
               } else {
-                node.log('getdata.json saved');
+                node.log(node.host+'.json saved');
               }
             });
             try {
@@ -215,7 +215,7 @@ module.exports = function(RED) {
 
   function writeToFilePromise(str) {
     return new Promise((resolve, reject) => {
-      fs.write("getdata.json", str, {flag: "x"}, (err) => {
+      fs.write(node.host+".json", str, {flag: "x"}, (err) => {
         if (err) return reject(err);
         resolve();
       });
