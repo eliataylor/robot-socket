@@ -23,11 +23,13 @@ module.exports = function(RED) {
   function RobotSocketFailures(msg, node) {
     // TODO: use RED.settings.logging.console.level to control debug / error messages
     node.error(msg);
-    node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
+    //node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
   }
 
   function RobotSocketSet(n) {
       RED.nodes.createNode(this,n);
+      console.log(RED.server.app);
+      console.log(RED.server.server);
       var node = this;
       node.name = n.name;
       node.simulated = n.simulated;
@@ -113,7 +115,7 @@ module.exports = function(RED) {
         var key = 'REG'+node.index;
         if (typeof rawData[key] != 'undefined') {
           rawData = rawData[key];
-          node.log('parsed json: ' + node.reg + ' - ' + key + ' == ' + rawData);
+          //node.log('parsed json: ' + node.reg + ' - ' + key + ' == ' + rawData);
         } else {
           node.error('json missing registry/index: ' + node.reg + ' / ' + key);  // will the robot ever send something back like this?
         }
@@ -171,7 +173,9 @@ module.exports = function(RED) {
           path: '/MD/getdata.stm',
           method: 'GET'
         };
-        node.log('getter path: ' + options.path);
+        //node.log('getter path: ' + options.path);
+
+        requestQueue.push(options, 'GET', callback);
 
         var req = http.get(options, function(res) {
 
@@ -182,7 +186,7 @@ module.exports = function(RED) {
             return;
           }
 
-          node.status({fill:"green",shape:"dot",text:"node-red:common.status.connected"}); // show the one node that is pooling the robot
+          //node.status({fill:"green",shape:"dot",text:"node-red:common.status.connected"}); // show the one node that is pooling the robot
           res.setEncoding('utf8');
 
           let rawData = '';
@@ -194,7 +198,7 @@ module.exports = function(RED) {
                 throw err;
                 return node.error('filewriter failed: '+node.host+'.json');
               } else {
-                node.log(node.host+'.json saved');
+                //node.log(node.host+'.json saved');
               }
             });
             try {
