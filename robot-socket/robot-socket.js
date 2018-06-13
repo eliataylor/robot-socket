@@ -3,6 +3,7 @@ module.exports = function(RED) {
 
   const fs = require("fs");
   const http = require('http');
+  const path = require('path');
 
   const templates = {
     "numreg" : {t:'/SMONDO/SETNREG%20:index%20:value'},
@@ -28,8 +29,8 @@ module.exports = function(RED) {
 
   function RobotSocketSet(n) {
       RED.nodes.createNode(this,n);
-      console.log(RED.server.app);
-      console.log(RED.server.server);
+      console.log('RED.server.app: ', RED.server.app); // @TODO: can these be used to handle global request queue???
+      console.log('RED.server.server:', RED.server.server);
       var node = this;
       node.name = n.name;
       node.simulated = n.simulated;
@@ -38,8 +39,6 @@ module.exports = function(RED) {
 
       var config =  RED.nodes.getNode(n.regpoint);
       node.host = config.host;
-
-      // node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
 
       node.on('input', function(msg) {
         var data = msg;
@@ -57,10 +56,10 @@ module.exports = function(RED) {
         }
 
         var obj = templates[node.reg]; // these are not dynamic variables and do not change are runtime (via inject / timestamps / http responses ... )
-        var path = obj.t;
+        var spath = obj.t;
         for(var i in obj.inject) {
           var regex = new RegExp(":"+i, 'g');
-          path = path.replace(regex, obj.inject[i]);
+          spath = spath.replace(regex, obj.inject[i]);
         }
 
         var runtimes = {
@@ -70,11 +69,17 @@ module.exports = function(RED) {
         }
         for(var i in runtimes) {
           var regex = new RegExp(":"+i, 'g'); // replaces ALL occurances of : plus the runtime/template key
-          path = path.replace(regex, encodeURIComponent(runtimes[i]));
+          spath = spath.replace(regex, encodeURIComponent(runtimes[i]));
         }
+
+        if (node.host === 'robot-test-data') {
+          //@TODO: edit robot-test-data.json and resave file
+        }
+
         var parts = node.host.split(':');
-        if (parts.length == 1) parts[1] = '1880';
-        var options = {host:parts[0], port: parseInt(parts[1]), path: path};
+        if (parts.length < 2) parts[1] = process.env.PORT;
+
+        var options = {host:parts[0], port: parseInt(parts[1]), path: spath};
         node.warn('setter path: ' + options.path);
 
         var req = http.get(options, function(res) {
@@ -123,10 +128,10 @@ module.exports = function(RED) {
         node.error('json missing registry: ' + node.reg); // will the robot ever send something back like this?
       }
 
-      node.send({payload:rawData, topic:'robotdata'}); // arbitrary topic
-      // node.status({fill:"green",shape:"dot",text:"node-red:common.status.ready"});
+      node.send({payload:rawData, topic:'gotrobotdata'}); // arbitrary topic
 
     } catch (e) {
+      console.log(typeof rawData, rawData);
       RobotSocketFailures(e, node);
     }
   }
@@ -141,79 +146,87 @@ module.exports = function(RED) {
 
       var config =  RED.nodes.getNode(n.regpoint);
       node.host = config.host;
-
-      // node.status({fill:"grey",shape:"dot",text:"node-red:common.status.ready"});
+      node.filename = node.host.toString().replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.json'; // @WARN: this still doesn't replace strings begnining or ending with non-alphanumeric characters
+      node.filepath = path.join(__dirname, '..', node.filename);
+      console.log("NODE INIT", node);
 
       node.on('input', function(msg) {
 
-        if (msg.filename == 'getdata.stm' || msg.filename == 'getdata.json' || msg.filename == node.host + '.json') {
-          node.warn(msg.filename + ' passed directly '); // this shoud never happen on productio. it's just for testing and retrieving the base getdata.stm file
-          return handleRobotJson(msg.payload, node);
-        }
+        if (msg.filename == node.filename && msg.payload.length > 0) {
+          // @INFO nodes can be passed the robot data via other request node. this node will just parse the configured values and pass it along
+          node.status(msg.filename + ' passed directly for parsing');
+          handleRobotJson(msg.payload, node);
+        }  else if (node.source == 'file') { // any getter nodes pointing a localhost load the static file if it exists
 
-        var parts = node.host.split(':');
-        if (parts.length == 1) parts[1] = '1880'; // this is just for my own testing without a robot
+          if (fs.existsSync(node.filepath)) {
 
-        if (node.source == 'file') { // any getter nodes pointing a localhost load the static file if it exists
-
-          fs.readFile(node.host + '.json', "utf8", (err, rawData) => {
-            if (err) {
-              return node.warn(node.host + '.json do not exist yet'); // make sure you have at least one getter loading from the robot IP
-            }
-            // retrieved static data file
-            handleRobotJson(rawData, node);
-          });
-          return;
-        }
-
-        // below is only for nodes loading from the robot IP
-        var options = {
-          host:parts[0],
-          port: parseInt(parts[1]),
-          path: '/MD/getdata.stm',
-          method: 'GET'
-        };
-        //node.log('getter path: ' + options.path);
-
-        requestQueue.push(options, 'GET', callback);
-
-        var req = http.get(options, function(res) {
-
-          const { statusCode } = res;
-          if (statusCode > 300) {
-            RobotSocketFailures(`Request Failed. Status Code: ${statusCode} ${options.path}`, node);
-            res.resume();  // consume response data to free up memory
-            return;
-          }
-
-          //node.status({fill:"green",shape:"dot",text:"node-red:common.status.connected"}); // show the one node that is pooling the robot
-          res.setEncoding('utf8');
-
-          let rawData = '';
-          res.on('data', (chunk) => { rawData += chunk; });
-          res.on('end', () => {
-            // WARN: i'm a bit worried about too many nodes writing at once.
-            fs.writeFile(node.host + '.json', rawData, { flag: 'w' }, (err) => {
+            //var jsonString = fs.readFileSync(jsonPath, 'utf8');
+            fs.readFile(node.filepath, "utf8", (err, rawData) => {
               if (err) {
-                throw err;
-                return node.error('filewriter failed: '+node.host+'.json');
+                node.warn('Error loading file: ' + node.filepath);
               } else {
-                //node.log(node.host+'.json saved');
+                // found local data file
+                handleRobotJson(rawData, node);
               }
             });
-            try {
-              rawData = JSON.parse(rawData);
-            } catch (e) {
-              return node.error(e.message);
+          } else {
+            // @TODO check to allow HTTP request fallback
+            node.status(node.filepath + ' File Missing. Be sure at least 1 getter node is requesting over HTTP to: ' + node.host);
+          }
+        } else {
+
+          var parts = node.host.split(':');
+          if (parts.length < 2) parts[1] = process.env.PORT;
+
+          // below is only for nodes loading from the robot IP
+          var options = {
+            host:parts[0],
+            port: parseInt(parts[1]),
+            path: '/MD/getdata.stm',
+            method: 'GET'
+          };
+          console.log('getter HTTP: ', options);
+
+          // @TODO: idea for  https://github.com/eliataylor/robot-socket/issues/1
+          //requestQueue.push(options, 'GET', callback);
+
+          var req = http.get(options, function(res) {
+            const { statusCode } = res;
+            if (statusCode > 300) {
+              RobotSocketFailures(`Request Failed. Status Code: ${statusCode} ${options.path}`, node);
+              res.resume();  // consume response data to free up memory
+            } else {
+              res.setEncoding('utf8');
+
+              let rawData = '';
+              res.on('data', (chunk) => { rawData += chunk; });
+              res.on('end', () => {
+                try {
+                  // @WARN: each and every getter node with HTTP setting will resave the file for this host
+                  fs.writeFile(node.filepath, rawData, { encoding: 'utf-8', flag: 'w' }, (err) => {
+                    if (err) {
+                      throw err;
+                      node.error('filewriter failed: '+node.filepath);
+                    } else {
+                      node.status(node.filepath+' file saved!');
+                    }
+                  });
+
+                  rawData = JSON.parse(rawData);
+                  handleRobotJson(rawData, node);
+
+
+                } catch (e) {
+                  console.log(typeof rawData, rawData);
+                  node.error(e.message);
+                }
+              });
             }
-            handleRobotJson(rawData, node);
-
           });
-        });
-
-        req.on('error', function(e){
-          RobotSocketFailures(e,node);
-        });
+          req.on('error', function(e){
+            RobotSocketFailures(e,node);
+          });
+        }
       });
   }
 
