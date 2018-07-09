@@ -2,8 +2,20 @@ module.exports = function(RED) {
   "use strict";
 
   const fs = require("fs");
-  const http = require('http');
+  //const http = require('http');
   const path = require('path');
+
+  var bodyParser = require("body-parser");
+  var multer = require("multer");
+  var cookieParser = require("cookie-parser");
+  var getBody = require('raw-body');
+  var cors = require('cors');
+  var jsonParser = bodyParser.json();
+  var urlencParser = bodyParser.urlencoded({extended:true});
+  var onHeaders = require('on-headers');
+  var typer = require('media-typer');
+  var isUtf8 = require('is-utf8');
+  var hashSum = require("hash-sum");
 
   const templates = {
     "numreg" : {t:'/SMONDO/SETNREG%20:index%20:value'},
@@ -21,7 +33,7 @@ module.exports = function(RED) {
       this.host = n.host;
   }
 
-  function RobotSocketFailures(msg, node) {
+  var RobotSocketFailures = function(msg, node) {
     // TODO: use RED.settings.logging.console.level to control debug / error messages
     node.error(msg);
     //node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
@@ -29,8 +41,8 @@ module.exports = function(RED) {
 
   function RobotSocketSet(n) {
       RED.nodes.createNode(this,n);
-      console.log('RED.server.app: ', RED.server.app); // @TODO: can these be used to handle global request queue???
-      console.log('RED.server.server:', RED.server.server);
+      //console.log('RED.server.app: ', RED.server.app); // @TODO: can these be used to handle global request queue???
+      //console.log('RED.server.server:', RED.server.server);
       var node = this;
       node.name = n.name;
       node.simulated = n.simulated;
@@ -82,7 +94,7 @@ module.exports = function(RED) {
         var options = {host:parts[0], port: parseInt(parts[1]), path: spath};
         node.warn('setter path: ' + options.path);
 
-        var req = http.get(options, function(res) {
+        var req = RED.httpNode.get(options, function(res) {
 
           const { statusCode } = res;
           if (statusCode > 300) {
@@ -135,6 +147,22 @@ module.exports = function(RED) {
       RobotSocketFailures(e, node);
     }
   }
+  var httpMiddleware = function(req,res,next) {
+    console.log('httpMiddleware');
+    next();
+  }
+  if (RED.settings.httpNodeMiddleware) {
+      if (typeof RED.settings.httpNodeMiddleware === "function") {
+          console.log('use settings httpNodeMiddleware!!!');
+          httpMiddleware = RED.settings.httpNodeMiddleware;
+      }
+  }
+
+  var corsHandler = function(req,res,next) { next(); }
+  if (RED.settings.httpNodeCors) {
+      corsHandler = cors(RED.settings.httpNodeCors);
+      RED.httpNode.options("*",corsHandler);
+  }
 
   function RobotSocketGet(n) {
       RED.nodes.createNode(this,n);
@@ -148,7 +176,7 @@ module.exports = function(RED) {
       node.host = config.host;
       node.filename = node.host.toString().replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.json'; // @WARN: this still doesn't replace strings begnining or ending with non-alphanumeric characters
       node.filepath = path.join(__dirname, '..', node.filename);
-      console.log("NODE INIT", node);
+      // console.log("NODE INIT", node);
 
       node.on('input', function(msg) {
 
@@ -185,47 +213,67 @@ module.exports = function(RED) {
             path: '/MD/getdata.stm',
             method: 'GET'
           };
-          console.log('getter HTTP: ', options);
+          //console.log('getter HTTP: ', options);
 
           // @TODO: idea for  https://github.com/eliataylor/robot-socket/issues/1
           //requestQueue.push(options, 'GET', callback);
 
-          var req = http.get(options, function(res) {
-            const { statusCode } = res;
-            if (statusCode > 300) {
-              RobotSocketFailures(`Request Failed. Status Code: ${statusCode} ${options.path}`, node);
-              res.resume();  // consume response data to free up memory
-            } else {
-              res.setEncoding('utf8');
+          var gotRobotData = function(res) {
+              const { statusCode } = res;
+              console.log('gotRobotData ' + statusCode);
+              if (statusCode > 300) {
+                RobotSocketFailures(`Request Failed. Status Code: ${statusCode} ${options.path}`, node);
+                res.resume();  // consume response data to free up memory
+              } else {
+                res.setEncoding('utf8');
 
-              let rawData = '';
-              res.on('data', (chunk) => { rawData += chunk; });
-              res.on('end', () => {
-                try {
-                  // @WARN: each and every getter node with HTTP setting will resave the file for this host
-                  fs.writeFile(node.filepath, rawData, { encoding: 'utf-8', flag: 'w' }, (err) => {
-                    if (err) {
-                      throw err;
-                      node.error('filewriter failed: '+node.filepath);
-                    } else {
-                      node.status(node.filepath+' file saved!');
-                    }
+                let rawData = '';
+                res.on('data', (chunk) => { rawData += chunk; });
+                res.on('end', () => {
+                  try {
+                    // @WARN: each and every getter node with HTTP setting will resave the file for this host
+                    fs.writeFile(node.filepath, rawData, { encoding: 'utf-8', flag: 'w' }, (err) => {
+                      if (err) {
+                        throw err;
+                        node.error('filewriter failed: '+node.filepath);
+                      } else {
+                        node.status(node.filepath+' file saved!');
+                      }
+                    });
+
+                    rawData = JSON.parse(rawData);
+                    handleRobotJson(rawData, node);
+
+
+                  } catch (e) {
+                    console.log(typeof rawData, rawData);
+                    node.error(e.message);
+                  }
+                });
+              }
+          }
+
+          var metricsHandler = function(req,res,next) { next(); }
+          if (this.metric()) {
+              metricsHandler = function(req, res, next) {
+                  var startAt = process.hrtime();
+                  onHeaders(res, function() {
+                      if (res._msgid) {
+                          var diff = process.hrtime(startAt);
+                          var ms = diff[0] * 1e3 + diff[1] * 1e-6;
+                          var metricResponseTime = ms.toFixed(3);
+                          var metricContentLength = res._headers["content-length"];
+                          //assuming that _id has been set for res._metrics in HttpOut node!
+                          node.metric("response.time.millis", {_msgid:res._msgid} , metricResponseTime);
+                          node.metric("response.content-length.bytes", {_msgid:res._msgid} , metricContentLength);
+                      }
                   });
-
-                  rawData = JSON.parse(rawData);
-                  handleRobotJson(rawData, node);
-
-
-                } catch (e) {
-                  console.log(typeof rawData, rawData);
-                  node.error(e.message);
-                }
-              });
-            }
-          });
-          req.on('error', function(e){
-            RobotSocketFailures(e,node);
-          });
+                  next();
+              };
+          }
+          console.log('requesting: ' + node.host + '/MD/getdata.stm');
+          RED.httpNode.get(node.host + '/MD/getdata.stm',gotRobotData,RobotSocketFailures);
+          // RED.httpNode.get(node.host + '/MD/getdata.stm',cookieParser(),httpMiddleware,corsHandler,metricsHandler,gotRobotData,RobotSocketFailures);
         }
       });
   }

@@ -55,8 +55,7 @@ module.exports = {
     //debugUseColors: true,
 
     // The file containing the flows. If not set, it defaults to flows_<hostname>.json
-    //flowFile: '/Users/macbookpro/Developer/flexibleassembly/RobotCommNode/robot-flows.json',
-    //flowFile: '/Users/macbookpro/Developer/flexibleassembly/RobotCommNode/test-suite.json',
+    //flowFile: 'flows.json',
 
     // To enabled pretty-printing of the flow within the flow file, set the following
     //  property to true:
@@ -96,9 +95,9 @@ module.exports = {
     // When httpAdminRoot is used to move the UI to a different root path, the
     // following property can be used to identify a directory of static content
     // that should be served at http://localhost:1880/.
-    //httpStatic: '/Users/macbookpro/Developer/tesla/radialarm/',
-    // httpStatic: '/Users/macbookpro/Developer/flexibleassembly/ui',
-    httpNodeRoot: '/Users/macbookpro/Developer/flexibleassembly/ui',
+
+    httpStatic: '/home/nol/node-red-static/',
+//    httpStatic: '/Users/macbookpro/Developer/tesla/radialarm/',
     httpAdminRoot: '/admin',
 
     // The maximum size of HTTP request that will be accepted by the runtime api.
@@ -168,13 +167,12 @@ module.exports = {
     // The following property can be used to add a custom middleware function
     // in front of all http in nodes. This allows custom authentication to be
     // applied to all http in nodes, or any other sort of common request processing.
-    httpNodeMiddleware: function(req,res,next) {
-        // Handle/reject the request, or pass it on to the http in node by calling next();
-        // Optionally skip our rawBodyParser by setting this to true;
-        console.log('httpNodeMiddleware', req);
-        req.skipRawBodyParser = true;
-        next();
-    },
+    //httpNodeMiddleware: function(req,res,next) {
+    //    // Handle/reject the request, or pass it on to the http in node by calling next();
+    //    // Optionally skip our rawBodyParser by setting this to true;
+    //    //req.skipRawBodyParser = true;
+    //    next();
+    //},
 
     // The following property can be used to verify websocket connection attempts.
     // This allows, for example, the HTTP request headers to be checked to ensure
@@ -227,18 +225,27 @@ module.exports = {
             // debug - record information which is more verbose than info + info + warn + error + fatal errors
             // trace - record very detailed logging + debug + info + warn + error + fatal errors
             // off - turn off all logging (doesn't affect metrics or audit)
-            level: "debug",
+            level: "info",
             // Whether or not to include metric events in the log output
             metrics: false,
             // Whether or not to include audit events in the log output
-            audit: true
+            audit: false
+        },
+        myCustomLogger: {
+            level: 'debug',
+            metrics: true,
+            handler: function(settings) {
+                return function(msg) {
+                    console.log(msg.timestamp, msg.event);
+                }
+            }
         }
     },
 
     editorTheme: {
       page: {
-          title: "Tesla MotionArm Controller",
-          favicon: "/Users/macbookpro/Developer/tesla/radialarm/images/favicon.ico"
+          title: "MotionCell",
+          favicon: "/Users/macbookpro/Developer/flexibleassembly/motioncell/images/refined_motion_logo.png"
       }
     }
 }
