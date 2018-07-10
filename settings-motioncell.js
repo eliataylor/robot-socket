@@ -174,6 +174,13 @@ module.exports = {
     //    next();
     //},
 
+    httpNodeMiddleware: function(req,res,next) {
+    //    // Handle/reject the request, or pass it on to the http in node by calling next();
+    //    // Optionally skip our rawBodyParser by setting this to true;
+        req.skipRawBodyParser = true;
+        next();
+    },
+
     // The following property can be used to verify websocket connection attempts.
     // This allows, for example, the HTTP request headers to be checked to ensure
     // they include valid authentication information.
@@ -201,7 +208,14 @@ module.exports = {
     //    context.global.os
 
     functionGlobalContext: {
-        // os:require('os'),
+         os:require('os'),
+         myqueue: {
+            let count = 0,
+            increment : function () {
+              count++;
+              return count;
+            }
+         }
         // octalbonescript:require('octalbonescript'),
         // jfive:require("johnny-five"),
         // j5board:require("johnny-five").Board({repl:false})
