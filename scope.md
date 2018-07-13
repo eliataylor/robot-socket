@@ -10,9 +10,6 @@
 -    Once the homing action is completed, a payload will be passed on to the next process node
 -    A global process comment should be updated with “System is Homing”. This comments purpose is to share machine status to the operator.
 
-__using Globals like this is not easy / possible in custom nodes__
-__
-
 ### 2. Move Node
 -    This node will carry several required and optional parameters. These include
   -- "Requested position" for X/Y/Z,
