@@ -117,9 +117,9 @@ module.exports = function(RED) {
         var options = {host:parts[0], port: parseInt(parts[1]), path: '/SMONDO/' + spath};
         node.warn('setter path: ' + options.path);
 
-        var singlePath = node.filepath.replace('.json', '.txt');
-        var singleHttp = fs.readFileSync(singlePath, 'utf8');
-        var param = '_' + node.reg + node.index;
+        var singlePath = node.filepath.replace('.json', '.txt'); // path to file holding ALL set values forever
+        var singleHttp = fs.readFileSync(singlePath, 'utf8'); // WARN: this will never remove previously set values
+        var param = '_' + node.reg + node.index; // parameter
         if (singleHttp) {
           singleHttp = upParam(param, spath, singleHttp);
         } else {
@@ -130,7 +130,7 @@ module.exports = function(RED) {
 
         msg = {topic:'robotdatasmondo'}; // arbitrary topic
         msg.payload = options;
-        node.send(msg);
+        node.send(msg); // send on to next node
 
 
         /*
