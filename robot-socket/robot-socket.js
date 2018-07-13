@@ -123,7 +123,7 @@ module.exports = function(RED) {
         if (singleHttp) {
           singleHttp = upParam(param, spath, singleHttp);
         } else {
-          singleHttp = '//' + parts[0] + ':' + parts[1] + '/SMONDO/testset.stm?' + param + '=' + spath;
+          singleHttp = '//' + parts[0] + ':' + parts[1] + '/FR/setdata.stm?' + param + '=' + spath;
         }
 
         fs.writeFileSync(singlePath, singleHttp, { encoding: 'utf-8', flag: 'w' });
