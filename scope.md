@@ -12,11 +12,11 @@
 
 ### 2. Move Node
 -    This node will carry several required and optional parameters. These include
-  - "Requested position" for X/Y/Z,
-  - "Speed" in which to move (defaulted to 100%. But editable by the user.  Range from 1-100)
-  - "Move Type" should default to Absolute. Incremental checkbox should be visible for selection.
-  - "Acceleration" should default to 100%. But editable by the user.  Range from 1-100
-  - "Unique point ID": echoed back once the move has been completed. This could be a timestamp.
+  - "Requested position" for X/Y/Z.
+  - "Move Type" should default to Absolute - Incremental checkbox should be visible for selection.
+  - "Speed" in which to move (defaulted to 100% - But editable by the user. Range from 1-100%)
+  - "Acceleration" should default to 100% - But editable by the user.  Range from 0-100
+  - "Unique point ID" : echoed back once the move has been completed. This could be a timestamp.
   - "User Comment"
 -    3 separate boxes should be shown pre-populated with the robots current position. These can be parsed from the JSON from the servos. Within the node parameters menu, an option for “Touchup Position” should be visible incase the user would like to reteach the points after the node has been dropped on screen. These boxes should have 2 decimal place resolution.
 -    Once the move has been completed, the payload will be passed on to the next process node.
@@ -28,13 +28,12 @@ __connecting a Dashboard UI component to this will be time consuming__
 ### Wait Node
 -    This node is not related to servo motion but intended to help programming a process flow. The intent is to allow a flow to wait for a global variable to equal a specified value before passing on a payload. This node will also have a “timeout” as well
 -    This node should have 2 outputs. Output 1 is intended to pass on the payload if the global variable is met within the specified time limit. Output 2 will be used to pass on the payload if the global variable times out.
--    timeout field should be in seconds. Range is from 0.1-60 seconds, __is there a never timeout option?__
+-    timeout field should be in seconds. Range is from 0.1-60 seconds
 
 ### Executable Node (modification of the daemon node)
 -    This node will be the connection to the servo application. Commands to and from node-red will pass through this node and connect node-red to the .EXE file running in parallel to node-red.
 -    Instead of running commands to the input of this node, the “homing” and “move” nodes should pass their commands behind the scenes to keep the process flow on screen clean. Data coming out of the node is formatted in JSON.
 -    Responses from the .exe should be analyzed for their response data to confirm if “move” or “Homing” has been completed (based on echo timestamp)
-
 
 
 ### Set Torque Node

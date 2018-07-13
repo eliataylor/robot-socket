@@ -18,14 +18,14 @@ module.exports = function(RED) {
   var hashSum = require("hash-sum");
 
   const templates = {
-    "numreg" : {t:'/SMONDO/SETNREG%20:index%20:value'},
-    "strreg" : {t:'/SMONDO/SETSREG%20:index%20:value'},
-    "DIN" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:1}},
-    "DOUT" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:2}},
-    "RI" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:8}},
-    "RO" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:9}},
-    "Flag" : {t:'/SMONDO/SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:35}},
-    "SysVar" : {t:'/SMONDO/SETVAR%20:index%20":value"'}
+    "numreg" : {t:'SETNREG%20:index%20:value'},
+    "strreg" : {t:'SETSREG%20:index%20:value'},
+    "DIN" : {t:'SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:1}},
+    "DOUT" : {t:'SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:2}},
+    "RI" : {t:'SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:8}},
+    "RO" : {t:'SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:9}},
+    "Flag" : {t:'SETIOVAL%20:ioval%20:index%20:simulated%20:value%20:value', inject:{ioval:35}},
+    "SysVar" : {t:'SETVAR%20:index%20":value"'}
   };
 
   function FanucRegistryNode(n) {
@@ -38,6 +38,29 @@ module.exports = function(RED) {
     node.error(msg);
     //node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
   }
+
+  // from trackauthority
+  var qParam = function(name, url) {
+       name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+       var regexS = "[\\?&]" + name + "=([^&#]*)";
+       var regex = new RegExp(regexS);
+       var results = null;
+       results = regex.exec(url);
+       if(results == null) return false;
+       else return results[1].replace(/\+/g, " ");
+   }
+
+   var upParam = function(param, val, href) {
+       var style = qParam(param, href);
+       if (style && style != "") {
+           href = href.replace("=" + style, "=" + val); // replace if it exists
+       } else if (href.indexOf("?") > -1) {
+           href += "&" + param + "=" + val; // add new param to others
+       } else {
+           href += "?" + param + "=" + val; // add only param to path
+       }
+       return href;
+   }
 
   function RobotSocketSet(n) {
       RED.nodes.createNode(this,n);
@@ -91,9 +114,26 @@ module.exports = function(RED) {
         var parts = node.host.split(':');
         if (parts.length < 2) parts[1] = process.env.PORT;
 
-        var options = {host:parts[0], port: parseInt(parts[1]), path: spath};
+        var options = {host:parts[0], port: parseInt(parts[1]), path: '/SMONDO/' + spath};
         node.warn('setter path: ' + options.path);
 
+        var singlePath = node.filepath.replace('.json', '.txt');
+        var singleHttp = fs.readFileSync(singlePath, 'utf8');
+        var param = '_' + node.reg + node.index;
+        if (singleHttp) {
+          singleHttp = upParam(param, spath, singleHttp);
+        } else {
+          singleHttp = '//' + parts[0] + ':' + parts[1] + '/SMONDO/testset.stm?' + param + '=' + spath;
+        }
+
+        fs.writeFileSync(singlePath, singleHttp, { encoding: 'utf-8', flag: 'w' });
+
+        msg = {topic:'robotdatasmondo'}; // arbitrary topic
+        msg.payload = options;
+        node.send(msg);
+
+
+        /*
         var req = RED.httpNode.get(options, function(res) {
 
           const { statusCode } = res;
@@ -117,6 +157,7 @@ module.exports = function(RED) {
         req.on('error', function(e){
           RobotSocketFailures(e,node);
         });
+        */
 
       });
   }
