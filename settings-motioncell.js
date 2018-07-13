@@ -210,10 +210,11 @@ module.exports = {
     functionGlobalContext: {
          os:require('os'),
          myqueue: {
-            let count = 0,
+            count : 0,
             increment : function () {
-              count++;
-              return count;
+              this.count++;
+              console.log('functionGlobalContext count: ' + this.count);
+              return this.count;
             }
          }
         // octalbonescript:require('octalbonescript'),

@@ -26,7 +26,7 @@ __
 -    A global process comment should be updated with a customizable “User Comment”. This comment is user specified within a text box. The purpose is to share machine status to the operator.
 -    Move should not be initiated if Servo JSON response shows servos as not ready or homing not complete
 
-__the Acceleration UI compone
+__connecting a Dashboard UI component to this will be time consuming__
 
 ### Wait Node
 -    This node is not related to servo motion but intended to help programming a process flow. The intent is to allow a flow to wait for a global variable to equal a specified value before passing on a payload. This node will also have a “timeout” as well

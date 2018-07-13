@@ -1,18 +1,7 @@
 /**
- * Copyright JS Foundation and other contributors, http://js.foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- **/
+MotionCell Move Node
+based on /usr/local/lib/node_modules/node-red/nodes/core/core/80-function.js
+**/
 
 module.exports = function(RED) {
     "use strict";
@@ -198,6 +187,8 @@ module.exports = function(RED) {
         try {
             this.script = vm.createScript(functionText);
             this.on("input", function(msg) {
+              console.log(context.context.get());
+              console.log(context.global.get());
                 try {
                     var start = process.hrtime();
                     context.msg = msg;
@@ -251,6 +242,6 @@ module.exports = function(RED) {
             this.error(err);
         }
     }
-    RED.nodes.registerType("function",FunctionNode);
-    RED.library.register("functions");
+    RED.nodes.registerType("mcmove",FunctionNode);
+    //RED.library.register("refinedmotion");
 }
