@@ -122,7 +122,7 @@ module.exports = function(RED) {
           options.port = parts[1];
         }
 
-        node.warn('setter path: ' + options.path);
+        //node.warn('setter path: ' + options.path);
 
         var singlePath = node.filepath.replace('.json', '.txt'); // path to file holding ALL set values forever
         var singleHttp = false;
