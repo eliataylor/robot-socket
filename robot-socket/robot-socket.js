@@ -2,7 +2,7 @@ module.exports = function(RED) {
   "use strict";
 
   const fs = require("fs");
-  //const http = require('http');
+  const http = require('http');
   const path = require('path');
 
   var bodyParser = require("body-parser");
@@ -146,7 +146,7 @@ module.exports = function(RED) {
 
 
         /*
-        var req = RED.httpNode.get(options, function(res) {
+        var req = http.get(options, function(res) {
 
           const { statusCode } = res;
           if (statusCode > 300) {
@@ -257,15 +257,17 @@ module.exports = function(RED) {
         } else {
 
           var parts = node.host.split(':');
-          if (parts.length < 2) parts[1] = process.env.PORT;
 
           // below is only for nodes loading from the robot IP
           var options = {
             host:parts[0],
-            port: parseInt(parts[1]),
             path: '/MD/getdata.stm',
             method: 'GET'
           };
+          if (parts.length > 1) {
+            options.port = parts[1];
+          }
+
           //console.log('getter HTTP: ', options);
 
           // @TODO: idea for  https://github.com/eliataylor/robot-socket/issues/1
@@ -324,8 +326,12 @@ module.exports = function(RED) {
                   next();
               };
           }
+
+
+
           console.log('requesting: ' + node.host + '/MD/getdata.stm');
-          RED.httpNode.get(node.host + '/MD/getdata.stm',gotRobotData,RobotSocketFailures);
+          http.get(options, gotRobotData,RobotSocketFailures);
+          // RED.httpNode.get(node.host + '/MD/getdata.stm',gotRobotData,RobotSocketFailures);
           // RED.httpNode.get(node.host + '/MD/getdata.stm',cookieParser(),httpMiddleware,corsHandler,metricsHandler,gotRobotData,RobotSocketFailures);
         }
       });
