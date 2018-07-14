@@ -123,7 +123,12 @@ module.exports = function(RED) {
         node.warn('setter path: ' + options.path);
 
         var singlePath = node.filepath.replace('.json', '.txt'); // path to file holding ALL set values forever
-        var singleHttp = fs.readFileSync(singlePath, 'utf8'); // WARN: this will never remove previously set values
+        var singleHttp = false;
+        try {
+          singleHttp = fs.readFileSync(singlePath, 'utf8'); // WARN: this will never remove previously set values
+        } catch(e) {
+          // do nothing
+        }
         var param = '_' + node.reg + node.index; // parameter
         if (singleHttp) {
           singleHttp = upParam(param, spath, singleHttp);
