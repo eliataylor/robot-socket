@@ -74,6 +74,11 @@ module.exports = function(RED) {
 
       var config =  RED.nodes.getNode(n.regpoint);
       node.host = config.host;
+      node.filename = node.host.toString().replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.json'; // @WARN: this still doesn't replace strings begnining or ending with non-alphanumeric characters
+      node.filepath = path.join(__dirname, '..', node.filename);
+
+      var config =  RED.nodes.getNode(n.regpoint);
+      node.host = config.host;
 
       node.on('input', function(msg) {
         var data = msg;
