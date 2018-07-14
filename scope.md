@@ -12,12 +12,21 @@
 
 ### 2. Move Node
 -    This node will carry several required and optional parameters. These include
+<<<<<<< HEAD
   - "Requested position" for X/Y/Z.
   - "Move Type" should default to Absolute - Incremental checkbox should be visible for selection.
   - "Speed" in which to move (defaulted to 100% - But editable by the user. Range from 1-100%)
   - "Acceleration" should default to 100% - But editable by the user.  Range from 0-100
   - "Unique point ID" : echoed back once the move has been completed. This could be a timestamp.
   - "User Comment"
+=======
+  -- "Requested position" for X/Y/Z,
+  -- "Speed" in which to move (defaulted to 100%. But editable by the user.  Range from 1-100)
+  -- "Move Type" should default to Absolute. Incremental checkbox should be visible for selection.
+  -- "Acceleration" should default to 100%. But editable by the user.  Range from 1-100
+  -- "Unique point ID": echoed back once the move has been completed. This could be a timestamp.
+  -- "User Comment"
+>>>>>>> parent of 2add2b7... mcMove based on function.js
 -    3 separate boxes should be shown pre-populated with the robots current position. These can be parsed from the JSON from the servos. Within the node parameters menu, an option for “Touchup Position” should be visible incase the user would like to reteach the points after the node has been dropped on screen. These boxes should have 2 decimal place resolution.
 -    Once the move has been completed, the payload will be passed on to the next process node.
 -    A global process comment should be updated with a customizable “User Comment”. This comment is user specified within a text box. The purpose is to share machine status to the operator.

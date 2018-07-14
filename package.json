@@ -1,5 +1,5 @@
 {
-    "name": "node-red-contrib-robot-socket",
+    "name": "node-red-contrib-refined-motion",
     "version": "1.0.1",
     "description": "simple configurable communication node between fanuc and node-red interface",
     "author": "Eli A Taylor for Flexible Assembly",
