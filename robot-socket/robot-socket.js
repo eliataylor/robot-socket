@@ -117,9 +117,11 @@ module.exports = function(RED) {
         }
 
         var parts = node.host.split(':');
-        if (parts.length < 2) parts[1] = process.env.PORT;
+        var options = {host:parts[0], path: '/SMONDO/' + spath};
+        if (parts.length > 1) {
+          options.port = parts[1];
+        }
 
-        var options = {host:parts[0], port: parseInt(parts[1]), path: '/SMONDO/' + spath};
         node.warn('setter path: ' + options.path);
 
         var singlePath = node.filepath.replace('.json', '.txt'); // path to file holding ALL set values forever
