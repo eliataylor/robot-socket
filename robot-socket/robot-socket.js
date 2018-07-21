@@ -177,6 +177,10 @@ module.exports = function(RED) {
   function handleRobotJson(rawData, node) {
     try {
       if (typeof rawData != 'object') {
+        if (rawData == '') {
+          console.log('empty json returned for:' + node.filename);
+          return;
+        }
         rawData = JSON.parse(rawData);
       }
 
@@ -262,7 +266,10 @@ module.exports = function(RED) {
           var options = {
             host:parts[0],
             path: '/MD/getdata.stm',
-            method: 'GET'
+            method: 'GET',
+            headers : {
+              Host : parts[0]
+            }
           };
           if (parts.length > 1) {
             options.port = parts[1];
@@ -327,13 +334,12 @@ module.exports = function(RED) {
               };
           }
 
-
-
           console.log('requesting: ' + node.host + '/MD/getdata.stm');
           http.get(options, gotRobotData,RobotSocketFailures);
           // RED.httpNode.get(node.host + '/MD/getdata.stm',gotRobotData,RobotSocketFailures);
           // RED.httpNode.get(node.host + '/MD/getdata.stm',cookieParser(),httpMiddleware,corsHandler,metricsHandler,gotRobotData,RobotSocketFailures);
         }
+
       });
   }
 
