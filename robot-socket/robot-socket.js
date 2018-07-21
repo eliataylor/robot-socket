@@ -246,6 +246,7 @@ module.exports = function(RED) {
           if (fs.existsSync(node.filepath)) {
 
             //var jsonString = fs.readFileSync(jsonPath, 'utf8');
+            // WARN: this could conflict with the writeFile 
             fs.readFile(node.filepath, "utf8", (err, rawData) => {
               if (err) {
                 node.warn('Error loading file: ' + node.filepath);
