@@ -33,7 +33,7 @@ module.exports = function(RED) {
       this.host = n.host;
   }
 
-  var RobotSocketFailures = function(msg, node) {
+  const RobotSocketFailures = function(msg, node) {
     // TODO: use RED.settings.logging.console.level to control debug / error messages
     node.error(msg);
     //node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
@@ -246,7 +246,7 @@ module.exports = function(RED) {
           if (fs.existsSync(node.filepath)) {
 
             //var jsonString = fs.readFileSync(jsonPath, 'utf8');
-            // WARN: this could conflict with the writeFile 
+            // WARN: this could conflict with the writeFile
             fs.readFile(node.filepath, "utf8", (err, rawData) => {
               if (err) {
                 node.warn('Error loading file: ' + node.filepath);
@@ -335,9 +335,10 @@ module.exports = function(RED) {
               };
           }
 
-          console.log('requesting: ' + node.host + '/MD/getdata.stm');
-          http.get(options, gotRobotData,RobotSocketFailures);
-          // RED.httpNode.get(node.host + '/MD/getdata.stm',gotRobotData,RobotSocketFailures);
+          let path = node.host + options.path;
+          console.log('requesting: ', path);
+          // http.get(options, gotRobotData, RobotSocketFailures);
+          RED.httpNode.get(path, gotRobotData, RobotSocketFailures);
           // RED.httpNode.get(node.host + '/MD/getdata.stm',cookieParser(),httpMiddleware,corsHandler,metricsHandler,gotRobotData,RobotSocketFailures);
         }
 
