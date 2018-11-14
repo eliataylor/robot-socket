@@ -283,7 +283,7 @@ module.exports = function(RED) {
 
           var gotRobotData = function(res) {
               const { statusCode } = res;
-              console.log('gotRobotData ' + statusCode);
+              //console.log('gotRobotData ' + statusCode);
               if (statusCode > 300) {
                 RobotSocketFailures(`Request Failed. Status Code: ${statusCode} ${options.path}`, node);
                 res.resume();  // consume response data to free up memory
@@ -336,10 +336,11 @@ module.exports = function(RED) {
           }
 
           let path = node.host + options.path;
-          console.log('requesting: ', path);
-          // http.get(options, gotRobotData, RobotSocketFailures);
-          RED.httpNode.get(path, gotRobotData, RobotSocketFailures);
-          // RED.httpNode.get(node.host + '/MD/getdata.stm',cookieParser(),httpMiddleware,corsHandler,metricsHandler,gotRobotData,RobotSocketFailures);
+          http.get(options, gotRobotData, RobotSocketFailures).on('error', (e) => {
+            console.error(`http error: ${e.message}`);
+          });
+          //RED.httpNode.get(path, gotRobotData, RobotSocketFailures);
+          //RED.httpNode.get(node.host + '/MD/getdata.stm',cookieParser(),httpMiddleware,corsHandler,metricsHandler,gotRobotData,RobotSocketFailures);
         }
 
       });
