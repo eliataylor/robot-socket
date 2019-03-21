@@ -1,0 +1,107 @@
+<!-- fanuc registry definition -->
+<script type="text/x-red" data-template-name="imagerie-settings">
+    <div class="form-row">
+        <label for="node-config-input-host"><i class="fa fa-link" aria-hidden="true"></i> Hostname</label>
+        <input type="text" id="node-config-input-host" placeholder="host">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="imagerie-settings">
+    <p>Imagerie Server Hostname</p>
+</script>
+
+<!-- getter -->
+<script type="text/x-red" data-template-name="predict-upload">
+    <div class="form-row">
+        <label for="node-input-imagerieconfig"><i class="fa fa-link" aria-hidden="true"></i>Host:Port</label>
+        <select id="node-input-imagerieconfig" ></select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-project"><i class="fa fa-outdent" aria-hidden="true"></i> Registry</label>
+        <select type="text" id="node-input-project" ></select>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="predict-upload">
+    <p>finds trained objects in uploaded photo</p>
+</script>
+
+<!-- setter -->
+<script type="text/x-red" data-template-name="predict-camera">
+    <div class="form-row">
+        <label for="node-input-imagerieconfig"><i class="fa fa-link" aria-hidden="true"></i> Host:Port</label>
+        <select id="node-input-imagerieconfig" ></select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-project"><i class="fa fa-registered" aria-hidden="true"></i> Project</label>
+        <select type="text" id="node-input-project" ></select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-camera"><i class="fa fa-registered" aria-hidden="true"></i> Camera</label>
+        <select type="text" id="node-input-camera" ></select>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="predict-camera">
+    <p>finds trained object in camera sourced photo</p>
+</script>
+
+
+<script type="text/javascript">
+(function() {
+    RED.nodes.registerType('imagerie-settings',{
+        category: 'config',
+        defaults: {
+            host: {value:"127.0.0.1:1880",required:true},
+        },
+        inputs:0,
+        outputs:0,
+        label: function() {
+            return this.host;
+        }
+    });
+
+    RED.nodes.registerType('predict-upload',{
+        category: 'FlexibleAssembly',
+        color: '#8eed28',
+        defaults: {
+            project: {value:"",required:true},
+            imagerieconfig: {type:"imagerie-settings",required:true}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "Robot_Receive2.png",
+        label: function() {
+            return this.project + ' predict upload';
+        }
+    });
+
+    RED.nodes.registerType('predict-camera',{
+        category: 'FlexibleAssembly',
+        color: '#33d4f4',
+        defaults: {
+            project: {value:"",required:true},
+            camera: {value:"",required:true},
+            imagerieconfig: {type:"imagerie-settings",required:true},
+        },
+        inputs:1,
+        outputs:1,
+        icon: "Robot_Send2.png",
+        label: function() {
+          return this.name || "set " + this.reg + ":" + this.index;
+        },
+        oneditprepare: function() {
+          // AJAX query projects from this server!!
+
+          // conditional logic to toggle Simulated field for the reg selection
+          $('#node-input-project').change(function() {
+              if ($(this).val() == 'RO' || $(this).val() == 'RI' || $(this).val() == 'DOUT' || $(this).val() == 'DIN')  {
+                $('#node-input-simulated-block').show();
+              } else {
+                $('#node-input-simulated-block').hide();
+              }
+          });
+        }
+    });
+})();
+</script>
