@@ -6,7 +6,8 @@
     "license": "UNLICENSED",
     "node-red": {
         "nodes": {
-            "robot-socket": "robot-socket/robot-socket.js"
+            "robot-socket": "robot-socket/robot-socket.js",
+            "imagerie-tools": "imagerie-tools/imagerie-tools.js"
         }
     },
     "dependencies": {

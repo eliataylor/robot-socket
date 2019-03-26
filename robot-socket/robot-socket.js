@@ -288,14 +288,14 @@ module.exports = function(RED) {
                 RobotSocketFailures(`Request Failed. Status Code: ${statusCode} ${options.path}`, node);
                 res.resume();  // consume response data to free up memory
               } else {
-                res.setEncoding('utf8');
+                //res.setEncoding('utf8');
 
                 let rawData = '';
                 res.on('data', (chunk) => { rawData += chunk; });
                 res.on('end', () => {
                   try {
                     // @WARN: each and every getter node with HTTP setting will resave the file for this host
-                    fs.writeFile(node.filepath, rawData, { encoding: 'utf-8', flag: 'w' }, (err) => {
+                    fs.writeFile(node.filepath, rawData, { flag: 'w' }, (err) => {
                       if (err) {
                         throw err;
                         node.error('filewriter failed: '+node.filepath);
