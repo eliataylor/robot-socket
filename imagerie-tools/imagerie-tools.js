@@ -53,25 +53,34 @@ module.exports = function(RED) {
           file = fs.createReadStream(file);
         }
 
-
         var form = new FormData();
         form.append('file', file);
 
-        /*
+/*
         var request = http.request({
           method: 'post',
           host: 'http://35.232.117.223',
           port: '80',
-          path: '/api/capture',
+          path: '/api/capture/predict/upload/' + node.project,
           headers: form.getHeaders()
         });
 
         form.pipe(request);
 
         request.on('response', function(res) {
-          console.log('form posted', res.statusCode);
+          console.log(res.statusCode);
+          node.send({
+            topic:'image-predicted',
+            filename:msg.filename,
+            payload:{
+              statusMessage:res.statusMessage,
+              statusCode:res.statusCode,
+              url:res.url,
+              method:res.method
+            }
+          })
         });
-        */
+*/
 
         form.submit(url, function(err, res) {
           if (err) {
