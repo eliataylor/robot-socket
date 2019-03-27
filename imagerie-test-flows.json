@@ -1,0 +1,69 @@
+[{
+  "id": "3690c642.dce07a",
+  "type": "tab",
+  "label": "Flow 1",
+  "disabled": false,
+  "info": ""
+}, {
+  "id": "1178e52a.c32b9b",
+  "type": "imagerie-settings",
+  "z": "",
+  "host": "http://35.232.117.223:80/api/capture"
+}, {
+  "id": "cca940fb.681f5",
+  "type": "predict-upload",
+  "z": "3690c642.dce07a",
+  "project": "gummies2",
+  "imagerieconfig": "1178e52a.c32b9b",
+  "x": 317.5,
+  "y": 401,
+  "wires": [
+    ["364cbe4c.198592"]
+  ]
+}, {
+  "id": "65dd1be6.fe9984",
+  "type": "file in",
+  "z": "3690c642.dce07a",
+  "name": "gummie-test",
+  "filename": "/Users/user/Downloads/haribo-gummi-cola-bottles-125859-im02.jpg",
+  "format": "",
+  "chunk": false,
+  "sendError": false,
+  "encoding": "none",
+  "x": 236,
+  "y": 228,
+  "wires": [
+    ["cca940fb.681f5"]
+  ]
+}, {
+  "id": "17d1fd9b.9e8a62",
+  "type": "inject",
+  "z": "3690c642.dce07a",
+  "name": "",
+  "topic": "",
+  "payload": "",
+  "payloadType": "date",
+  "repeat": "",
+  "crontab": "",
+  "once": false,
+  "onceDelay": 0.1,
+  "x": 252.5,
+  "y": 101,
+  "wires": [
+    ["65dd1be6.fe9984"]
+  ]
+}, {
+  "id": "364cbe4c.198592",
+  "type": "debug",
+  "z": "3690c642.dce07a",
+  "name": "",
+  "active": true,
+  "tosidebar": true,
+  "console": true,
+  "tostatus": false,
+  "complete": "true",
+  "targetType": "full",
+  "x": 385.5,
+  "y": 573,
+  "wires": []
+}]
