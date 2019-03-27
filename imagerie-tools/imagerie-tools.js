@@ -5,6 +5,8 @@ module.exports = function(RED) {
   const http = require('http');
   const path = require('path');
 
+  var FormData = require('form-data');
+
   var bodyParser = require("body-parser");
   var multer = require("multer");
   var cookieParser = require("cookie-parser");
@@ -13,9 +15,6 @@ module.exports = function(RED) {
   var jsonParser = bodyParser.json();
   var urlencParser = bodyParser.urlencoded({extended:true});
   var onHeaders = require('on-headers');
-  var typer = require('media-typer');
-  var isUtf8 = require('is-utf8');
-  var hashSum = require("hash-sum");
 
   function ImagerieConfigNode(n) {
       RED.nodes.createNode(this,n);
@@ -28,33 +27,65 @@ module.exports = function(RED) {
     //node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
   }
 
-  const PopulateProjects = function(host) {
-    $.getJSON(host + '/project', function(data) {
-      console.log("KNOWN PROJECTS", data);
-    });
-  }
-
   function PredictUpload(n) {
       RED.nodes.createNode(this,n);
+      var config = RED.nodes.getNode(n.imagerieconfig);
       var node = this;
-      node.project = n.project;
-
-      var config =  RED.nodes.getNode(n.imagerieconfig);
       node.host = config.host;
-      PopulateProjects(node.host);
-      console.log("PredictCamera NODE INIT", node);
+      node.project = n.project;
+      //console.log(n, config, node);
 
       node.on('input', function(msg) {
-        var data = msg;
-        if (typeof data == 'string') data = JSON.parse(msg);
-        if (typeof msg.payload == 'object') {
-          node.error('invalid set value');
-        //  return false;
+        if (!node.project) {
+          return alert("Select a project");
+        }
+        var url = node.host + '/predict/upload/' + node.project;
+        console.log("POST Image to " + url);
+
+        var file = msg.filename;
+        if (msg.payload instanceof Buffer) {
+          file = msg.payload;
+        } else if (typeof file == 'string') {
+          file = fs.createReadStream(file);
         }
 
-        var value = data.payload;
-        if (value == null) value = '';
 
+        var form = new FormData();
+        form.append('file', file);
+
+        /*
+        var request = http.request({
+          method: 'post',
+          host: 'http://35.232.117.223',
+          port: '80',
+          path: '/api/capture',
+          headers: form.getHeaders()
+        });
+
+        form.pipe(request);
+
+        request.on('response', function(res) {
+          console.log('form posted', res.statusCode);
+        });
+        */
+
+        form.submit(url, function(err, res) {
+          if (err) {
+            console.error(err.statusMessage);
+          } else {
+            res.resume();
+            node.send({
+              topic:'image-predicted',
+              filename:msg.filename,
+              payload:{
+                statusMessage:res.statusMessage,
+                statusCode:res.statusCode,
+                url:res.url,
+                method:res.method
+              }
+            });
+          }
+        });
 
       });
   }
@@ -64,16 +95,6 @@ module.exports = function(RED) {
       var node = this;
       node.project = n.project;
       node.camera = n.camera;
-
-      var config =  RED.nodes.getNode(n.imagerieconfig);
-      node.host = config.host;
-      PopulateProjects(node.host);
-      console.log("PredictCamera NODE INIT", node);
-
-      node.on('input', function(msg) {
-        // POST predict/upload/{project}
-        // RED.httpNode.get(node.host + '/MD/getdata.stm',cookieParser(),httpMiddleware,corsHandler,metricsHandler,gotRobotData,HandleFailures);
-      });
   }
 
   const httpMiddleware = function(req,res,next) {

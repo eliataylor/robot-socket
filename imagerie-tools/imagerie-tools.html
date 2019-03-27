@@ -18,7 +18,9 @@
     </div>
     <div class="form-row">
         <label for="node-input-project"><i class="fa fa-outdent" aria-hidden="true"></i>Project</label>
-        <select type="text" id="node-input-project" ></select>
+        <select type="text" id="node-input-project" >
+          <option>Set your host:port/path where projects are loaded
+        </select>
     </div>
 </script>
 
@@ -49,30 +51,47 @@
 
 <script type="text/javascript">
 (function() {
+    const PopulateProjects = function() {
+      var host = $('#node-input-imagerieconfig option:selected').text();
+      if (host.indexOf('http') !== 0) {
+        console.log("Select a server host");
+        return false;
+      }
+      var url = host + '/project';
+
+      // TODO: display preloader
+      $('#node-input-project').html('<option>Please Wait. Loading projects...</options>');
+
+      $.ajax({
+        url: url,
+        dataType: "json"
+      }).done(function (data) {
+        console.log("FOUND PROJECTS at " + host, data);
+        $('#node-input-project').html('');
+        for (var d=0; d < data.length; d++) {
+            $('<option/>',{
+                'value': data[d].id,
+                'text': data[d].name
+            }).appendTo('#node-input-project');
+        }
+      }).error(function(err){
+        $('#node-input-project').html('Error loading projects');
+        console.log(err);
+      });
+    }
+
     RED.nodes.registerType('imagerie-settings',{
         category: 'config',
         defaults: {
-            host: {value:"http://35.232.117.223:80",required:true},
+            host: {value:"http://35.232.117.223:80/api/capture",required:true},
         },
         inputs:0,
         outputs:0,
         label: function() {
             return this.host;
         },
-        oneditprepare: function() {
-           var node = this;
-           console.log("ONEDITPREPARE", node);
-
-           var host = RED.nodes.getNode(node);
-           console.log("HOST CONFIG: ",  host);
-
-          $.getJSON(host + '/project', function(data) {
-            console.log("KNOWN PROJECTS", data);
-          });
-          // AJAX query projects from this server!!
-          $('#node-input-project').change(function() {
-              console.log($(this).val())
-          });
+        oneditsave: function() {
+          PopulateProjects();
         }
     });
 
@@ -81,7 +100,7 @@
         color: '#8eed28',
         defaults: {
             project: {value:"",required:true},
-            imagerieconfig: {type:"imagerie-settings",required:true, value:"http://35.232.117.223:80"}
+            imagerieconfig: {type:"imagerie-settings",required:true}
         },
         inputs:1,
         outputs:1,
@@ -90,20 +109,7 @@
           return this.name || "predict " + this.project;
         },
         oneditprepare: function(e) {
-          var node = this;
-          console.log("ONEDITPREPARE", node, e);
-
-          var host = RED.nodes.getNode(node);
-          console.log("HOST: ", host);
-
-          $.getJSON(host + '/project', function(data) {
-            console.log("KNOWN PROJECTS", data);
-          });
-
-          // AJAX query projects from this server!!
-          $('#node-input-project').change(function() {
-              console.log($(this).val())
-          });
+          PopulateProjects();
         }
     });
 
@@ -113,7 +119,7 @@
         defaults: {
             project: {value:"",required:true},
             camera: {value:"",required:true},
-            imagerieconfig: {type:"imagerie-settings",required:true, value:"http://35.232.117.223:80"},
+            imagerieconfig: {type:"imagerie-settings",required:true},
         },
         inputs:1,
         outputs:1,
@@ -122,17 +128,10 @@
           return this.name || "predict " + this.project + ":" + this.camera;
         },
         oneditprepare: function() {
-           var node = this;
-           console.log("ONEDITPREPARE", node);
+          PopulateProjects();
 
-           var host = RED.nodes.getNode(node.imagerieconfig);
-           console.log("HOST: ", host);
-
-          $.getJSON(host + '/project', function(data) {
-            console.log("KNOWN PROJECTS", data);
-          });
-          // AJAX query projects from this server!!
           $('#node-input-project').change(function() {
+              // get cameras!
               console.log($(this).val())
           });
         }
