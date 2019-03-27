@@ -97,14 +97,14 @@
 
     RED.nodes.registerType('predict-upload',{
         category: 'FlexibleAssembly',
-        color: '#8eed28',
+        color: '#c26bcc',
         defaults: {
             project: {value:"",required:true},
             imagerieconfig: {type:"imagerie-settings",required:true}
         },
         inputs:1,
         outputs:1,
-        icon: "Robot_Receive2.png",
+        icon: "outline-visibility-24px.svg",
         label: function() {
           return this.name || "predict " + this.project;
         },
@@ -115,7 +115,7 @@
 
     RED.nodes.registerType('predict-camera',{
         category: 'FlexibleAssembly',
-        color: '#33d4f4',
+        color: '#ffdb20',
         defaults: {
             project: {value:"",required:true},
             camera: {value:"",required:true},
@@ -123,7 +123,7 @@
         },
         inputs:1,
         outputs:1,
-        icon: "Robot_Send2.png",
+        icon: "outline-videocam-24px.svg",
         label: function() {
           return this.name || "predict " + this.project + ":" + this.camera;
         },
