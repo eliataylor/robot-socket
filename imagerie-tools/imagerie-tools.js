@@ -82,6 +82,9 @@ module.exports = function(RED) {
             console.error(err.statusMessage);
           } else {
             res.resume();
+            if (res.statusCode != 200) {
+              console.log(res);
+            }
             node.send({
               topic:'image-predicted',
               filename:msg.filename,

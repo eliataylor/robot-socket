@@ -19,7 +19,7 @@
     <div class="form-row">
         <label for="node-input-project"><i class="fa fa-outdent" aria-hidden="true"></i>Project</label>
         <select type="text" id="node-input-project" >
-          <option>Set your host:port/path where projects are loaded
+          <option>Set your host:port/path to load projects</option>
         </select>
     </div>
 </script>
@@ -36,11 +36,15 @@
     </div>
     <div class="form-row">
         <label for="node-input-project"><i class="fa fa-registered" aria-hidden="true"></i> Project</label>
-        <select type="text" id="node-input-project" ></select>
+        <select type="text" id="node-input-project" >
+          <option>Set your host:port/path to load projects</option>
+        </select>
     </div>
     <div class="form-row">
         <label for="node-input-camera"><i class="fa fa-registered" aria-hidden="true"></i> Camera</label>
-        <select type="text" id="node-input-camera" ></select>
+        <select type="text" id="node-input-camera" >
+          <option>Set your host:port/path to load cameras</option>
+        </select>
     </div>
 </script>
 
@@ -74,8 +78,37 @@
                 'text': data[d].name
             }).appendTo('#node-input-project');
         }
+        PopulateCameras();
       }).error(function(err){
         $('#node-input-project').html('Error loading projects');
+        console.log(err);
+      });
+    }
+
+    const PopulateCameras = function() {
+      var host = $('#node-input-imagerieconfig option:selected').text();
+      if (host.indexOf('http') !== 0) {
+        return false;
+      }
+      var url = host + '/camera';
+
+      // TODO: display preloader
+      $('#node-input-camera').html('<option>Please Wait. Loading cameras...</options>');
+
+      $.ajax({
+        url: url,
+        dataType: "json"
+      }).done(function (data) {
+        console.log("FOUND CAMERAS at " + host, data);
+        $('#node-input-camera').html('');
+        for (var d=0; d < data.length; d++) {
+            $('<option/>',{
+                'value': data[d].index,
+                'text': data[d].name
+            }).appendTo('#node-input-camera');
+        }
+      }).error(function(err){
+        $('#node-input-project').html('Error loading cameras');
         console.log(err);
       });
     }
