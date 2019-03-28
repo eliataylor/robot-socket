@@ -6,15 +6,7 @@ module.exports = function(RED) {
   const path = require('path');
 
   var FormData = require('form-data');
-
-  var bodyParser = require("body-parser");
-  var multer = require("multer");
-  var cookieParser = require("cookie-parser");
-  var getBody = require('raw-body');
   var cors = require('cors');
-  var jsonParser = bodyParser.json();
-  var urlencParser = bodyParser.urlencoded({extended:true});
-  var onHeaders = require('on-headers');
 
   function ImagerieConfigNode(n) {
       RED.nodes.createNode(this,n);
@@ -49,8 +41,11 @@ module.exports = function(RED) {
         var file = msg.filename;
         if (msg.payload instanceof Buffer) {
           file = msg.payload;
+          console.log("as buffer ");
         } else if (typeof file == 'string') {
+          console.log("from filepath ", file);
           file = fs.createReadStream(file);
+          console.log("to stream ", file);
         }
 
         var form = new FormData();
@@ -158,17 +153,6 @@ module.exports = function(RED) {
         });
 
       });
-  }
-
-  const httpMiddleware = function(req,res,next) {
-    console.log('httpMiddleware');
-    next();
-  }
-  if (RED.settings.httpNodeMiddleware) {
-      if (typeof RED.settings.httpNodeMiddleware === "function") {
-          console.log('Use settings httpNodeMiddleware');
-          httpMiddleware = RED.settings.httpNodeMiddleware;
-      }
   }
 
   const corsHandler = function(req,res,next) { next(); }
