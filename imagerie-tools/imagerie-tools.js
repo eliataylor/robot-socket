@@ -16,6 +16,7 @@ module.exports = function(RED) {
   const HandleFailures = function(msg, node) {
     // TODO: use RED.settings.logging.console.level to control debug / error messages
     node.error(msg);
+    console.log(msg);
     //node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
   }
 
@@ -132,7 +133,7 @@ module.exports = function(RED) {
                               `Expected application/json but received ${contentType}`);
           }
           if (error) {
-            console.error(error.message);
+            HandleFailures(error.message);
             // Consume response data to free up memory
             res.resume();
             return;
@@ -150,11 +151,11 @@ module.exports = function(RED) {
                 payload:parsedData
               });
             } catch (e) {
-              console.error(e.message);
+              HandleFailures(error.message);
             }
           });
         }).on('error', (e) => {
-          console.error(`Got error: ${e.message}`);
+          HandleFailures(error.message);
         });
 
       });
