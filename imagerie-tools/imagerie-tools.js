@@ -121,6 +121,7 @@ module.exports = function(RED) {
         console.log("GET Image to " + url);
 
         http.get(url, (res) => {
+          console.log(url, res);
           const { statusCode } = res;
           const contentType = res.headers['content-type'];
 
