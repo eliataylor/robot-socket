@@ -103,7 +103,9 @@ module.exports = function(RED) {
 
   function PredictCamera(n) {
       RED.nodes.createNode(this,n);
+      var config = RED.nodes.getNode(n.imagerieconfig);
       var node = this;
+      node.host = config.host;
       node.project = n.project;
       node.camera = n.camera;
 
