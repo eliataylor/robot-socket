@@ -6,21 +6,14 @@
     "license": "UNLICENSED",
     "node-red": {
         "nodes": {
+            "camera-tools": "camera-tools/camera-tools.js",
             "robot-socket": "robot-socket/robot-socket.js",
-            "imagerie-tools": "imagerie-tools/imagerie-tools.js",
-            "camera-tools": "camera-tools/camera-tools.js"
+            "imagerie-tools": "imagerie-tools/imagerie-tools.js"
         }
     },
     "dependencies": {
-        "body-parser": "1.18.2",
-        "cookie-parser": "1.4.3",
         "cors": "2.8.4",
         "form-data": "^2.3.3",
-        "hash-sum": "1.0.2",
-        "is-utf8": "0.2.1",
-        "media-typer": "0.3.0",
-        "multer": "1.3.0",
-        "on-headers": "1.0.1",
-        "raw-body": "2.3.2"
+        "on-headers": "1.0.1"
     }
 }

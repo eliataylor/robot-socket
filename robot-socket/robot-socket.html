@@ -1,17 +1,17 @@
 <!-- fanuc registry definition -->
-<script type="text/x-red" data-template-name="fanuc-registry">
+<script type="text/html" data-template-name="fanuc-registry">
     <div class="form-row">
         <label for="node-config-input-host"><i class="fa fa-link" aria-hidden="true"></i> Hostname</label>
         <input type="text" id="node-config-input-host" placeholder="host">
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="fanuc-registry">
+<script type="text/html" data-help-name="fanuc-registry">
     <p>Fanuc Registry Hostname</p>
 </script>
 
 <!-- getter -->
-<script type="text/x-red" data-template-name="robot-socket-get">
+<script type="text/html" data-template-name="robot-socket-get">
     <div class="form-row">
       <label for="node-input-name"><i class="fa fa-tag"></i> Name<span data-i18n="common.label.name"></span></label>
       <input type="text" id="node-input-name" />
@@ -46,12 +46,12 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="robot-socket-get">
+<script type="text/html" data-help-name="robot-socket-get">
     <p>receives getdata.stm from fanuc robot</p>
 </script>
 
 <!-- setter -->
-<script type="text/x-red" data-template-name="robot-socket-set">
+<script type="text/html" data-template-name="robot-socket-set">
     <div class="form-row">
       <label for="node-input-name"><i class="fa fa-tag"></i> Name<span data-i18n="common.label.name"></span></label>
       <input type="text" id="node-input-name" />
@@ -86,7 +86,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="robot-socket-set">
+<script type="text/html" data-help-name="robot-socket-set">
     <p>sets registry keys and values for fanuc robot</p>
 </script>
 

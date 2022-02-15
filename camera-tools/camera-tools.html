@@ -1,3 +1,5 @@
+<script type="text/javascript" src="resources/node-red-contrib-refined-motion/camera-controller.js" />
+
 <script type="text/html" data-template-name="camserver">
     <div class="form-row">
         <label for="node-config-input-host"><i class="fa fa-link" aria-hidden="true"></i> Host : Port</label>
@@ -5,14 +7,14 @@
     </div>
 </script>
 
-<script type="text/html" data-help-name="cameras">
+<script type="text/html" data-help-name="camserver">
     <p>Camera Location</p>
 </script>
 
 <script type="text/html" data-template-name="set-camera-config">
     <div class="form-row">
-        <label for="node-input-camserver"><i class="fa fa-link" ></i>Cam Location</label>
-        <input type="text" id="node-input-camserver" >
+        <label for="node-input-camlocation"><i class="fa fa-link" ></i>Cam Location</label>
+        <select id="node-input-camlocation" ></select>
     </div>
     <div class="form-row">
         <label for="node-input-camera"><i class="fa fa-camera" ></i>Target Cam</label>
@@ -32,110 +34,10 @@
     <p>finds trained objects from uploaded</p>
 </script>
 
-
 <script type="text/javascript">
     (function () {
 
-        const getAllAttributes = el => el
-            .getAttributeNames()
-            .reduce((obj, name) => ({
-                ...obj,
-                [name]: el.getAttribute(name)
-            }), {})
-
-        const PreloadCameras = function (host) {
-            console.log("PreloadCameras", host);
-
-            // var url = host + '/vision/cameras';
-            var url = "/static/api/cameras.json"; // "resources/camera-tools/api/cameras.json";
-
-            let cameras = localStorage.getItem('flexV-'+host+'-Cameras')
-            if (cameras) {
-                cameras = JSON.parse(cameras);
-                console.log("LS", cameras);
-                $('#node-input-camera').html('');
-                return cameras.forEach(o => {
-                    $('<option/>', {
-                        'value': o.id,
-                        'text': o.user_defined_name
-                    }).appendTo('#node-input-camera');
-                })
-            }
-
-            $('#node-input-camera').html('<option>Please Wait. Loading cameras...</option>');
-
-            $.ajax({
-                url: url,
-                dataType: "json"
-            }).done(function (data) {
-                console.log("Got Cameras from " + host, data);
-                localStorage.setItem('flexV-'+host+'-Cameras', JSON.stringify(data))
-
-                $('#node-input-camera').html('');
-                data.forEach(o => {
-                    $('<option/>', {
-                        'value': o.id,
-                        'text': o.user_defined_name
-                    }).appendTo('#node-input-camera');
-                })
-            }).error(function (err) {
-                $('#node-input-camera').html('Error loading cameras');
-                console.log(err);
-            });
-        }
-
-        const PreloadCamConfigs = function (camId) {
-            var host = $('#node-input-camserver option:selected').text();
-            if (!host || host.indexOf('http') !== 0) {
-                console.log("PreloadCamConfigs: Select a Camera Server " + host, this);
-                return false;
-            }
-
-            var url = host + '/api/vision/vision/configTree/' + camId;
-            url = "/static/api/configTree.json?camId=" + camId;
-
-            $('#node-input-camprop').html('<option>Please Wait. Loading Camera Config Tree...</option>');
-
-            $.ajax({
-                url: url,
-                dataType: "json"
-            }).done(function (data) {
-                console.log("Got Config Tree:", data);
-                let allTypes = {}
-                $('#node-input-camprop').html('');
-                let parents = {};
-                for(let parent in data) {
-                    if (!parents[parent]) {
-                        $('<option/>', {
-                            'text': parent,
-                            'disabled':true
-                        }).appendTo('#node-input-camprop');
-                        parents[parent] = true;
-                    }
-                    for(let selector in data[parent]) {
-                        allTypes[data[parent][selector].type] = true;
-                        var toPass = {}
-                        for (let p in data[parent][selector]) {
-                            toPass['data-'+p] = data[parent][selector][p];
-                        }
-                        toPass.value = data[parent][selector].value;
-                        toPass.text = selector;
-                        toPass['data-parent'] = parent;
-                        $('<option/>', toPass).appendTo('#node-input-camprop');
-                    }
-                }
-                console.info(Object.keys(allTypes));
-            }).error(function (err) {
-                $('#node-input-camprop').html('Error loading cameras');
-                console.error(err);
-            });
-        }
-
-        BuildPropValField = function($opt)  {
-            // TODO: handle: ['Enumerate', 'String', 'Integer', 'Float', 'Command', 'Bool', 'null']
-            console.log("BUILD ", $opt);
-            $('#node-input-propval').html('');
-        }
+        const camController = new CameraController($)
 
         RED.nodes.registerType('camserver', {
             category: 'config',
@@ -150,28 +52,35 @@
             },
             oneditsave: function () {
                 $('#node-input-camera').addClass('loading');
-                setTimeout(() => {
-                    var host = $('#node-input-camserver option:selected').text();
+                setTimeout(async () => {
+                    var host = $('#node-input-camlocation option:selected').text();
                     if (!host || host.indexOf('http') !== 0) {
                         console.warn("Select a Camera Server " + host);
                         return false;  // TODO: retry?
                     }
-                    console.log("CAMSERVER timeout: ", host)
-                    PreloadCameras(host);
-                    $('#node-input-camera').removeClass('loading');
+                    console.log("CamServer Timeout: " + host)
+                    camController.setHost(host);
+                    await camController.loadCameras(true);
+                    camController.renderCameras();
+
+                    if (camController.cam) {
+                        await camController.loadCamConfigs()
+                        camController.renderCamProps();
+                    }
+
                 }, 500)
             }
         });
 
         RED.nodes.registerType('set-camera-config', {
-            category: 'FlexibleAssembly',
+            category: 'Flexible Vision',
             paletteLabel:'Configure Camera',
             color: '#de7f7f',
             defaults: {
                 camera: {value: "", required: true},
                 camprop: {value: "", required: true},
                 propval: {value: "", required: true},
-                camserver: {type: "camserver", required: true}
+                camlocation: {type: "camserver", required: true}
             },
             inputs: 1,
             outputs: 1,
@@ -185,28 +94,28 @@
                 return parts.join(' - ');
             },
             oneditprepare: function () {
-                debugger;
-                console.log("set-camera-config oneditprepare", this);
+                console.log("set-camera-config oneditprepare");
 
-                $('#node-input-camera').change(function () {
-                    PreloadCamConfigs($(this).val())
+                $('#node-input-camera').change(async (e) => {
+                    let camId = $(e).val();
+                    console.log("CAM CHANGED: " + camId, $(e).get(0));
+                    if (camId && camId !== '') {
+                        camController.setCam(camId);
+                        await camController.loadCamConfigs()
+                        camController.renderCamProps();
+                    }
                 });
 
-                if (this.camprop && this.camprop.length > 0) {
-                    // disabled??
-                }
-
-                $('#node-input-camprop').change(function () {
-                    let selected = $(this).find("option:selected");
+                $('#node-input-camprop').change((e) => {
+                    let selected = $('#node-input-camprop option:selected');
+                    console.log("CAMPROPs CHANGED", selected);
                     if (selected.length === 0) {
+                        console.warn("NOTHING SELECTED", e);
                         return false;
                     }
-                    console.log(selected, selected.get(0));
-                    debugger;
-                    let toPass = getAllAttributes(selected.get(0));
-                    BuildPropValField(toPass)
+                    let toPass = camController.getAllAttributes(selected.get(0));
+                    camController.buildPropValField(toPass)
                 });
-
             }
         });
     })();
