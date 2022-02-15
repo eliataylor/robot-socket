@@ -4,18 +4,8 @@ module.exports = function(RED) {
   const fs = require("fs");
   const http = require('http');
   const path = require('path');
-
-  var bodyParser = require("body-parser");
-  var multer = require("multer");
-  var cookieParser = require("cookie-parser");
-  var getBody = require('raw-body');
   var cors = require('cors');
-  var jsonParser = bodyParser.json();
-  var urlencParser = bodyParser.urlencoded({extended:true});
   var onHeaders = require('on-headers');
-  var typer = require('media-typer');
-  var isUtf8 = require('is-utf8');
-  var hashSum = require("hash-sum");
 
   const templates = {
     "numreg" : {t:'SETNREG%20:index%20:value'},

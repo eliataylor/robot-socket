@@ -7,7 +7,8 @@
     "node-red": {
         "nodes": {
             "robot-socket": "robot-socket/robot-socket.js",
-            "imagerie-tools": "imagerie-tools/imagerie-tools.js"
+            "imagerie-tools": "imagerie-tools/imagerie-tools.js",
+            "camera-tools": "camera-tools/camera-tools.js"
         }
     },
     "dependencies": {

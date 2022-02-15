@@ -97,7 +97,7 @@ module.exports = {
     // that should be served at http://localhost:1880/.
 
     httpStatic: '/home/nol/node-red-static/',
-//    httpStatic: '/Users/macbookpro/Developer/tesla/radialarm/',
+//    httpStatic: '~/tesla/radialarm/',
     httpAdminRoot: '/admin',
 
     // The maximum size of HTTP request that will be accepted by the runtime api.
@@ -260,7 +260,7 @@ module.exports = {
     editorTheme: {
       page: {
           title: "MotionCell",
-          favicon: "/Users/macbookpro/Developer/flexibleassembly/motioncell/images/refined_motion_logo.png"
+          favicon: "~/flexibleassembly/motioncell/images/refined_motion_logo.png"
       }
     }
 }

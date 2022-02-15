@@ -1,0 +1,38 @@
+[
+  {
+    "id": "142121710143",
+    "vendor": "SENSOR TECHNOLOGY CO., LTD",
+    "model": "STC-MCE132U3V",
+    "tl_type": "U3V",
+    "user_defined_name": "Camera01",
+    "serial_number": "142121710143",
+    "version": "1.46.1.7",
+    "cam_idx": 0,
+    "deviceType": "USB3Vision",
+    "height": 480,
+    "width": 640,
+    "WidthMax": 1280,
+    "HeightMax": 1024,
+    "macId": null,
+    "isGige": false,
+    "scale": 100
+  },
+  {
+    "id": "142120208749",
+    "vendor": "SENTECH",
+    "model": "STC-MCS500U3V",
+    "tl_type": "U3V",
+    "user_defined_name": "FV Cam",
+    "serial_number": "142120208749",
+    "version": "2.31.0.32",
+    "cam_idx": 1,
+    "deviceType": "USB3Vision",
+    "height": 2048,
+    "width": 2448,
+    "WidthMax": 2448,
+    "HeightMax": 2048,
+    "macId": null,
+    "isGige": false,
+    "scale": 100
+  }
+]

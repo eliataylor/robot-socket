@@ -1,0 +1,547 @@
+[
+  {
+    "id": "e583048378e103aa",
+    "type": "tab",
+    "label": "Flow 2",
+    "disabled": false,
+    "info": "",
+    "env": []
+  },
+  {
+    "id": "6b63718b4575d4fb",
+    "type": "serial-port",
+    "serialport": "/dev/ttyACM1",
+    "serialbaud": "9600",
+    "databits": "8",
+    "parity": "none",
+    "stopbits": "1",
+    "waitfor": "",
+    "dtr": "none",
+    "rts": "none",
+    "cts": "none",
+    "dsr": "none",
+    "newline": "0",
+    "bin": "false",
+    "out": "time",
+    "addchar": "",
+    "responsetimeout": "10000"
+  },
+  {
+    "id": "3c0b2553118a1046",
+    "type": "server-settings",
+    "workstation": "hmi",
+    "username": "admin",
+    "password": "fvonprem",
+    "host": "172.17.0.1"
+  },
+  {
+    "id": "a760ef6285445edd",
+    "type": "ui_tab",
+    "name": "Home",
+    "icon": "dashboard",
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "4797a34854dc7006",
+    "type": "ui_base",
+    "theme": {
+      "name": "theme-light",
+      "lightTheme": {
+        "default": "#0094CE",
+        "baseColor": "#0094CE",
+        "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+        "edited": true,
+        "reset": false
+      },
+      "darkTheme": {
+        "default": "#097479",
+        "baseColor": "#097479",
+        "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+        "edited": false
+      },
+      "customTheme": {
+        "name": "Untitled Theme 1",
+        "default": "#4B7930",
+        "baseColor": "#4B7930",
+        "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+      },
+      "themeState": {
+        "base-color": {
+          "default": "#0094CE",
+          "value": "#0094CE",
+          "edited": false
+        },
+        "page-titlebar-backgroundColor": {
+          "value": "#0094CE",
+          "edited": false
+        },
+        "page-backgroundColor": {
+          "value": "#fafafa",
+          "edited": false
+        },
+        "page-sidebar-backgroundColor": {
+          "value": "#ffffff",
+          "edited": false
+        },
+        "group-textColor": {
+          "value": "#1bbfff",
+          "edited": false
+        },
+        "group-borderColor": {
+          "value": "#ffffff",
+          "edited": false
+        },
+        "group-backgroundColor": {
+          "value": "#ffffff",
+          "edited": false
+        },
+        "widget-textColor": {
+          "value": "#111111",
+          "edited": false
+        },
+        "widget-backgroundColor": {
+          "value": "#0094ce",
+          "edited": false
+        },
+        "widget-borderColor": {
+          "value": "#ffffff",
+          "edited": false
+        },
+        "base-font": {
+          "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+        }
+      },
+      "angularTheme": {
+        "primary": "indigo",
+        "accents": "blue",
+        "warn": "red",
+        "background": "grey",
+        "palette": "light"
+      }
+    },
+    "site": {
+      "name": "Dashboard",
+      "hideToolbar": "true",
+      "allowSwipe": "true",
+      "lockMenu": "false",
+      "allowTempTheme": "true",
+      "dateFormat": "DD/MM/YYYY",
+      "sizes": {
+        "sx": 48,
+        "sy": 48,
+        "gx": 6,
+        "gy": 6,
+        "cx": 6,
+        "cy": 6,
+        "px": 0,
+        "py": 0
+      }
+    }
+  },
+  {
+    "id": "421f748743db85e9",
+    "type": "ui_group",
+    "name": "Default",
+    "tab": "a760ef6285445edd",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false,
+    "className": ""
+  },
+  {
+    "id": "2823664704c76c22",
+    "type": "fanuc-registry",
+    "host": "127.0.0.1:1880"
+  },
+  {
+    "id": "faf92db636b2fa1d",
+    "type": "serial-port",
+    "serialport": "com1",
+    "serialbaud": "57600",
+    "databits": "8",
+    "parity": "none",
+    "stopbits": "1",
+    "waitfor": "",
+    "dtr": "none",
+    "rts": "none",
+    "cts": "none",
+    "dsr": "none",
+    "newline": "\\n",
+    "bin": "false",
+    "out": "char",
+    "addchar": "",
+    "responsetimeout": "10000"
+  },
+  {
+    "id": "cfc5bba0e14882c9",
+    "type": "http request",
+    "z": "e583048378e103aa",
+    "name": "List Cameras",
+    "method": "GET",
+    "ret": "txt",
+    "paytoqs": "ignore",
+    "url": "http://172.17.0.1:5555/api/vision/vision/cameras",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "x": 670,
+    "y": 260,
+    "wires": [
+      [
+        "360d68bf5cb74e80"
+      ]
+    ]
+  },
+  {
+    "id": "16325bd41334fa7d",
+    "type": "debug",
+    "z": "e583048378e103aa",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1030,
+    "y": 260,
+    "wires": []
+  },
+  {
+    "id": "ac06bcc66037e711",
+    "type": "inject",
+    "z": "e583048378e103aa",
+    "name": "",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 360,
+    "y": 220,
+    "wires": [
+      [
+        "cfc5bba0e14882c9"
+      ]
+    ]
+  },
+  {
+    "id": "360d68bf5cb74e80",
+    "type": "json",
+    "z": "e583048378e103aa",
+    "name": "",
+    "property": "payload",
+    "action": "",
+    "pretty": false,
+    "x": 880,
+    "y": 260,
+    "wires": [
+      [
+        "16325bd41334fa7d"
+      ]
+    ]
+  },
+  {
+    "id": "af38eff819915b90",
+    "type": "http request",
+    "z": "e583048378e103aa",
+    "name": "Camera Config List",
+    "method": "GET",
+    "ret": "txt",
+    "paytoqs": "ignore",
+    "url": "http://172.17.0.1:5555/api/vision/vision/configTree/142121710143",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "x": 680,
+    "y": 340,
+    "wires": [
+      [
+        "48af1cfbc885cd77"
+      ]
+    ]
+  },
+  {
+    "id": "e7c2aa70782df272",
+    "type": "serial request",
+    "z": "e583048378e103aa",
+    "name": "",
+    "serial": "6b63718b4575d4fb",
+    "x": 680,
+    "y": 560,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "8b348b979914d36f",
+    "type": "inject",
+    "z": "e583048378e103aa",
+    "name": "",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 440,
+    "y": 340,
+    "wires": [
+      [
+        "af38eff819915b90"
+      ]
+    ]
+  },
+  {
+    "id": "48af1cfbc885cd77",
+    "type": "json",
+    "z": "e583048378e103aa",
+    "name": "",
+    "property": "payload",
+    "action": "",
+    "pretty": false,
+    "x": 870,
+    "y": 340,
+    "wires": [
+      [
+        "738bb8ec231dff6b"
+      ]
+    ]
+  },
+  {
+    "id": "738bb8ec231dff6b",
+    "type": "debug",
+    "z": "e583048378e103aa",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1030,
+    "y": 340,
+    "wires": []
+  },
+  {
+    "id": "2ddcfc05db778bfc",
+    "type": "http request",
+    "z": "e583048378e103aa",
+    "name": "Release Single Camera",
+    "method": "GET",
+    "ret": "txt",
+    "paytoqs": "ignore",
+    "url": "http://172.17.0.1:5555/api/vision/vision/release/142121710143",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "x": 680,
+    "y": 420,
+    "wires": [
+      [
+        "2f4d4bf455043661"
+      ]
+    ]
+  },
+  {
+    "id": "9761744557772628",
+    "type": "inject",
+    "z": "e583048378e103aa",
+    "name": "",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 420,
+    "y": 420,
+    "wires": [
+      [
+        "2ddcfc05db778bfc"
+      ]
+    ]
+  },
+  {
+    "id": "054d985bd452b6d5",
+    "type": "debug",
+    "z": "e583048378e103aa",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1050,
+    "y": 420,
+    "wires": []
+  },
+  {
+    "id": "2f4d4bf455043661",
+    "type": "json",
+    "z": "e583048378e103aa",
+    "name": "",
+    "property": "payload",
+    "action": "",
+    "pretty": false,
+    "x": 890,
+    "y": 420,
+    "wires": [
+      [
+        "054d985bd452b6d5"
+      ]
+    ]
+  },
+  {
+    "id": "10af469fe9b87648",
+    "type": "onprem-snap",
+    "z": "e583048378e103aa",
+    "preset": "1",
+    "fvconfig": "3c0b2553118a1046",
+    "x": 380,
+    "y": 540,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "355d49faeb81cb91",
+    "type": "http request",
+    "z": "e583048378e103aa",
+    "name": "Update Camera Resolution",
+    "method": "POST",
+    "ret": "txt",
+    "paytoqs": "ignore",
+    "url": "http://172.17.0.1:5555/api/vision/vision/resolution/142121710143/640/480",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "x": 700,
+    "y": 480,
+    "wires": [
+      [
+        "bbe8ebd4e7727f43"
+      ]
+    ]
+  },
+  {
+    "id": "85cbef71f22e860f",
+    "type": "inject",
+    "z": "e583048378e103aa",
+    "name": "",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 430,
+    "y": 480,
+    "wires": [
+      [
+        "355d49faeb81cb91"
+      ]
+    ]
+  },
+  {
+    "id": "17e650abb383392a",
+    "type": "debug",
+    "z": "e583048378e103aa",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1060,
+    "y": 480,
+    "wires": []
+  },
+  {
+    "id": "bbe8ebd4e7727f43",
+    "type": "json",
+    "z": "e583048378e103aa",
+    "name": "",
+    "property": "payload",
+    "action": "",
+    "pretty": false,
+    "x": 900,
+    "y": 480,
+    "wires": [
+      [
+        "17e650abb383392a"
+      ]
+    ]
+  },
+  {
+    "id": "5c43a03b72879ed9",
+    "type": "robot-socket-get",
+    "z": "e583048378e103aa",
+    "name": "",
+    "reg": "",
+    "index": "",
+    "source": "http",
+    "x": 400,
+    "y": 800,
+    "wires": [
+      []
+    ]
+  }
+]

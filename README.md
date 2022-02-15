@@ -5,4 +5,4 @@
 
 
 - EX.
-PORT=3080 node-red /Users/macbookpro/Developer/flexibleassembly/RobotCommNode/motioncell-flow.json -s /Users/macbookpro/Developer/flexibleassembly/RobotCommNode/settings-motioncell.js
+PORT=3080 node-red ~/flexibleassembly/RobotCommNode/motioncell-flow.json -s ~/flexibleassembly/RobotCommNode/settings-motioncell.js

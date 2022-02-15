@@ -55,8 +55,8 @@ module.exports = {
     //debugUseColors: true,
 
     // The file containing the flows. If not set, it defaults to flows_<hostname>.json
-    //flowFile: '/Users/macbookpro/Developer/flexibleassembly/RobotCommNode/robot-flows.json',
-    //flowFile: '/Users/macbookpro/Developer/flexibleassembly/RobotCommNode/test-suite.json',
+    //flowFile: '~/flexibleassembly/RobotCommNode/robot-flows.json',
+    //flowFile: '~/flexibleassembly/RobotCommNode/test-suite.json',
 
     // To enabled pretty-printing of the flow within the flow file, set the following
     //  property to true:
@@ -96,9 +96,9 @@ module.exports = {
     // When httpAdminRoot is used to move the UI to a different root path, the
     // following property can be used to identify a directory of static content
     // that should be served at http://localhost:1880/.
-    //httpStatic: '/Users/macbookpro/Developer/tesla/radialarm/',
-    // httpStatic: '/Users/macbookpro/Developer/flexibleassembly/ui',
-    httpNodeRoot: '/Users/macbookpro/Developer/flexibleassembly/ui',
+    //httpStatic: '~/tesla/radialarm/',
+    // httpStatic: '~/flexibleassembly/ui',
+    httpNodeRoot: '~/flexibleassembly/ui',
     httpAdminRoot: '/admin',
 
     // The maximum size of HTTP request that will be accepted by the runtime api.
@@ -238,7 +238,7 @@ module.exports = {
     editorTheme: {
       page: {
           title: "Tesla MotionArm Controller",
-          favicon: "/Users/macbookpro/Developer/tesla/radialarm/images/favicon.ico"
+          favicon: "~/tesla/radialarm/images/favicon.ico"
       }
     }
 }
