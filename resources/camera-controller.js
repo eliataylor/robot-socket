@@ -17,7 +17,13 @@ class CameraController {
         if (!forceReload) {
             let cameras = localStorage.getItem('flexV-'+this.host+'-Cameras')
             if (cameras) {
-                return JSON.parse(cameras);
+                cameras = JSON.parse(cameras)
+                this.allCameras = cameras;
+                if (!this.cam) {
+                    this.cam = cameras[0].id;
+                }
+                this.$(this.camSelector).removeClass('loading')
+                return cameras;
             }
         }
 
@@ -92,29 +98,65 @@ class CameraController {
                 parents[parent] = true;
             }
             for(let selector in this.camSettings[parent]) {
-                allTypes[this.camSettings[parent][selector].type] = true;
+                allTypes[this.camSettings[parent][selector].type] = selector;
                 var toPass = {}
-                for (let p in this.camSettings[parent][selector]) {
-                    toPass['data-'+p] = this.camSettings[parent][selector][p];
-                }
-                toPass.value = this.camSettings[parent][selector].value;
-                toPass.text = selector;
                 toPass['data-parent'] = parent;
+                toPass.value = selector;
+                toPass.text = selector;
+                if (this.camSettings[parent][selector].type === 'null') {
+                    toPass.disabled = true;
+                }
                 this.$('<option/>', toPass).appendTo(this.camPropSelector);
             }
         }
-        console.info(Object.keys(allTypes));
+        console.info(allTypes);
     }
 
-    buildPropValField (opt)  {
-        // TODO: handle: ['Enumerate', 'String', 'Integer', 'Float', 'Command', 'Bool', 'null']
-        this.camProperty = opt;
-        console.log("BUILD ", opt);
-        this.$(this.camPropValSelector).html('');
+    buildPropValField ()  {
+        const typeMap = {
+            'Enumerate':{type:'select', nodeName:'select'},
+            'String':{type:'text', nodeName:'input'},
+            'Integer':{type:'number', nodeName:'input'},
+            'Float':{type:'number', nodeName:'input'},
+            'Command':{type:'textarea', nodeName:'textarea'},
+            'Bool':{type:'checkbox', nodeName:'checkbox'}
+        };
+
+        let config = typeMap[this.camProperty.type];
+
+        if (this.$(this.camPropValSelector).get(0).nodeName.toLowerCase() !== config.nodeName) {
+            // replace element with correct HTML5 element
+            const newEl = document.createElement(config.nodeName);
+            newEl.setAttribute('type', config.type);
+            newEl.id = this.camPropValSelector.substring(1); // strip hash
+            this.$(this.camPropValSelector).replaceWith(newEl)
+            // TODO: if checkbox > add label
+        }
+
+        if (this.camProperty.min) {
+            // TODO: VALIDATION
+        }
+        config.value = this.camProperty.value;
+        if (this.camProperty.options) {
+            this.$('<option/>', {text:config.value, value:config.value}).appendTo(this.camPropValSelector)
+            // TODO: loop other options
+        }
+        console.log("BUILD ", config, 'from', this.camProperty);
+
+        for(let c in config) {
+            this.$(this.camPropValSelector).attr(c, config[c]);
+        };
+        this.getToolTip()
+
     }
 
     releaseCamera() {
         //
+    }
+
+    getToolTip() {
+        let html = JSON.stringify(this.camProperty, null, 2);
+        this.$('#camPropertyDesc').html(html)
     }
 
     getAllAttributes(el) {
@@ -123,6 +165,10 @@ class CameraController {
                 ...obj,
                 [name]: el.getAttribute(name)
             }), {})
+    }
+
+    setProperty(parent, selector) {
+        this.camProperty = this.camSettings[parent][selector];
     }
 
     setHost(host) {

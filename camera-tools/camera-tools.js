@@ -55,7 +55,7 @@ module.exports = function (RED) {
         RED.httpNode.options("*", corsHandler);
     }
 
-    RED.nodes.registerType("camserver", CameraLocationNode);
+    RED.nodes.registerType("camera-server", CameraLocationNode);
     RED.nodes.registerType("set-camera-config", SetCameraConfig);
 
 }

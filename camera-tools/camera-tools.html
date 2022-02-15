@@ -1,13 +1,13 @@
 <script type="text/javascript" src="resources/node-red-contrib-refined-motion/camera-controller.js" />
 
-<script type="text/html" data-template-name="camserver">
+<script type="text/html" data-template-name="camera-server">
     <div class="form-row">
-        <label for="node-config-input-host"><i class="fa fa-link" aria-hidden="true"></i> Host : Port</label>
+        <label for="node-config-input-host"><i class="fa fa-link" ></i> Host : Port</label>
         <input type="text" id="node-config-input-host" placeholder="host">
     </div>
 </script>
 
-<script type="text/html" data-help-name="camserver">
+<script type="text/html" data-help-name="camera-server">
     <p>Camera Location</p>
 </script>
 
@@ -18,20 +18,21 @@
     </div>
     <div class="form-row">
         <label for="node-input-camera"><i class="fa fa-camera" ></i>Target Cam</label>
-        <select type="text" id="node-input-camera" ></select>
+        <select id="node-input-camera" ></select>
     </div>
     <div class="form-row">
-        <label for="node-input-camprop"><i class="fa fa-outdent" ></i>Cam Property</label>
-        <select type="text" id="node-input-camprop" ></select>
+        <label for="node-input-camprop"><i class="fa fa-tag" ></i>Cam Property</label>
+        <select id="node-input-camprop" ></select>
     </div>
     <div class="form-row">
         <label for="node-input-propval"><i class="fa fa-outdent" ></i>Property Value</label>
-        <select type="text" id="node-input-propval" ></select>
+        <select id="node-input-propval" ></select>
     </div>
 </script>
 
 <script type="text/html" data-help-name="set-camera-config">
-    <p>finds trained objects from uploaded</p>
+    <p>Camera Property Options</p>
+    <div id="camPropertyDesc"></div>
 </script>
 
 <script type="text/javascript">
@@ -39,7 +40,7 @@
 
         const camController = new CameraController($)
 
-        RED.nodes.registerType('camserver', {
+        RED.nodes.registerType('camera-server', {
             category: 'config',
             paletteLabel:'Camera Server',
             defaults: {
@@ -77,10 +78,10 @@
             paletteLabel:'Configure Camera',
             color: '#de7f7f',
             defaults: {
+                camlocation: {type: "camera-server", required: true},
                 camera: {value: "", required: true},
                 camprop: {value: "", required: true},
-                propval: {value: "", required: true},
-                camlocation: {type: "camserver", required: true}
+                propval: {value: "", required: true, inputLabels:camController.getToolTip},
             },
             inputs: 1,
             outputs: 1,
@@ -113,8 +114,9 @@
                         console.warn("NOTHING SELECTED", e);
                         return false;
                     }
-                    let toPass = camController.getAllAttributes(selected.get(0));
-                    camController.buildPropValField(toPass)
+                    // let toPass = camController.getAllAttributes(selected.get(0));
+                    camController.setProperty(selected.attr('data-parent'), selected.attr('value'))
+                    camController.buildPropValField()
                 });
             }
         });
