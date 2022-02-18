@@ -2,52 +2,74 @@ module.exports = function (RED) {
     "use strict";
 
     // const fs = require("fs");
-    // const http = require('http');
-    var cors = require('cors');
+    const http = require('http');
+    const cors = require('cors');
+
+    function RemoteServerNode(n) {
+        RED.nodes.createNode(this,n);
+        this.host = n.host;
+        this.port = n.port;
+    }
 
     function CameraLocationNode(n) {
         RED.nodes.createNode(this, n);
-        this.host = n.host;
-    }
-
-    const HandleFailures = function (msg, node) {
-        // TODO: use RED.settings.logging.console.level to control debug / error messages
-        node.error(msg);
-        console.error(msg);
-        //node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
+        this.camlocation = n.camlocation;
     }
 
     function SetCameraConfig(n) {
         RED.nodes.createNode(this, n);
-        var config = RED.nodes.getNode(n.camserver);
         var node = this;
-        node.camserver = config.camserver;
+        node.camlocation = RED.nodes.getNode(n.camlocation);
         node.camera = n.camera;
         node.camprop = n.camprop;
         node.propval = n.propval;
-        console.log(n, config, node);
+        console.log("SetCameraConfig", n, node);
+
+        const HandleFailures = function (msg) {
+            // TODO: use RED.settings.logging.console.level to control debug / error messages
+            node.error(msg);
+            console.error(msg);
+            //node.status({fill:"red",shape:"dot",text:"node-red:common.status.not-connected"});
+        }
+
+        const HandleReponse = function(data) {
+            node.send({
+                topic: 'cam-config-set',
+                payload: data
+            });
+        }
 
         node.on('input', function (msg) {
-            var url = node.camserver + '/vision/configureCamera/' + node.camera + '/' + node.camprop + '/' + node.propval;
+
+            const url = node.camlocation + '/vision/configureCamera/' + node.camera + '/' + node.camprop + '/' + node.propval;
             console.log("POST Image to " + url);
 
-            $.ajax({
-                method: "POST",
-                url: url,
-                dataType: "json"
-            }).done(function (data) {
-                node.send({
-                    topic: 'cam-config-set',
-                    payload: data
-                });
-            }).error(function (err) {
-                HandleFailures(err)
+            const options = {method: "POST", url: url, dataType: "json"};
+
+            http.get(options, HandleReponse, HandleFailures).on('error', (e) => {
+                console.error(`http error: ${e.message}`);
             });
 
         });
     }
 
-    const corsHandler = function (req, res, next) {
+
+    function MyNode(config) {
+        RED.nodes.createNode(this,config);
+
+        // Retrieve the config node
+        this.server = RED.nodes.getNode(config.server);
+
+        if (this.server) {
+            // Do something with:
+            //  this.server.host
+            //  this.server.port
+        } else {
+            // No config node configured
+        }
+    }
+
+    let corsHandler = function (req, res, next) {
         next();
     }
     if (RED.settings.httpNodeCors) {
@@ -55,7 +77,8 @@ module.exports = function (RED) {
         RED.httpNode.options("*", corsHandler);
     }
 
+    RED.nodes.registerType("remote-server",RemoteServerNode);
     RED.nodes.registerType("camera-server", CameraLocationNode);
-    RED.nodes.registerType("set-camera-config", SetCameraConfig);
+    RED.nodes.registerType("set-camera-property", SetCameraConfig);
 
 }

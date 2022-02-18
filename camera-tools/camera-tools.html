@@ -1,9 +1,23 @@
 <script type="text/javascript" src="resources/node-red-contrib-refined-motion/camera-controller.js" />
+<style type="text/css">
+    .red-ui-editor .form-row, .red-ui-editor-dialog .form-row { display: flex!important; align-content: center!important; }
+</style>
+
+<script type="text/html" data-template-name="remote-server">
+    <div class="form-row">
+        <label for="node-config-input-host"><i class="fa fa-bookmark"></i> Host</label>
+        <input type="text" id="node-config-input-host">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-port"><i class="fa fa-bookmark"></i> Port</label>
+        <input type="text" id="node-config-input-port">
+    </div>
+</script>
 
 <script type="text/html" data-template-name="camera-server">
     <div class="form-row">
-        <label for="node-config-input-host"><i class="fa fa-link" ></i> Host : Port</label>
-        <input type="text" id="node-config-input-host" placeholder="host">
+        <label for="node-config-input-camlocation"><i class="fa fa-link" ></i> Host : Port</label>
+        <input type="text" id="node-config-input-camlocation" placeholder="host">
     </div>
 </script>
 
@@ -11,26 +25,26 @@
     <p>Camera Location</p>
 </script>
 
-<script type="text/html" data-template-name="set-camera-config">
+<script type="text/html" data-template-name="set-camera-property">
     <div class="form-row">
-        <label for="node-input-camlocation"><i class="fa fa-link" ></i>Cam Location</label>
+        <label for="node-input-camlocation"><i class="fa fa-link" ></i> Cam Location</label>
         <select id="node-input-camlocation" ></select>
     </div>
     <div class="form-row">
-        <label for="node-input-camera"><i class="fa fa-camera" ></i>Target Cam</label>
+        <label for="node-input-camera"><i class="fa fa-camera" ></i> Target Cam</label>
         <select id="node-input-camera" ></select>
     </div>
     <div class="form-row">
-        <label for="node-input-camprop"><i class="fa fa-tag" ></i>Cam Property</label>
+        <label for="node-input-camprop"><i class="fa fa-tag" ></i> Cam Property</label>
         <select id="node-input-camprop" ></select>
     </div>
     <div class="form-row">
-        <label for="node-input-propval"><i class="fa fa-outdent" ></i>Property Value</label>
+        <label for="node-input-propval"><i class="fa fa-outdent" ></i> Property Value</label>
         <select id="node-input-propval" ></select>
     </div>
 </script>
 
-<script type="text/html" data-help-name="set-camera-config">
+<script type="text/html" data-help-name="set-camera-property">
     <p>Camera Property Options</p>
     <div id="camPropertyDesc"></div>
 </script>
@@ -38,85 +52,95 @@
 <script type="text/javascript">
     (function () {
 
-        const camController = new CameraController($)
+        RED.nodes.registerType('remote-server',{
+            category: 'config',
+            defaults: {
+                host: {value:"localhost",required:true},
+                port: {value:1234,required:true,validate:RED.validators.number()},
+            },
+            label: function() {
+                return this.host+":"+this.port;
+            }
+        });
 
         RED.nodes.registerType('camera-server', {
             category: 'config',
             paletteLabel:'Camera Server',
             defaults: {
-                host: {value: "http://127.0.0.1:1880", required: true}
+                camlocation: {value: "http://127.0.0.1:1880", required: true}
             },
             inputs: 0,
             outputs: 0,
             label: function () {
-                return this.host;
+                return this.camlocation;
             },
-            oneditsave: function () {
-                $('#node-input-camera').addClass('loading');
-                setTimeout(async () => {
-                    var host = $('#node-input-camlocation option:selected').text();
-                    if (!host || host.indexOf('http') !== 0) {
-                        console.warn("Select a Camera Server " + host);
-                        return false;  // TODO: retry?
-                    }
-                    console.log("CamServer Timeout: " + host)
-                    camController.setHost(host);
-                    await camController.loadCameras(true);
-                    camController.renderCameras();
-
-                    if (camController.cam) {
-                        await camController.loadCamConfigs()
-                        camController.renderCamProps();
-                    }
-
-                }, 500)
+            onpaletteadd : () => {
+                this.camController = new CameraController($)
+            },
+            onpaletteremove : () => {
+                this.camController = undefined;
             }
         });
 
-        RED.nodes.registerType('set-camera-config', {
+        RED.nodes.registerType('set-camera-property', {
             category: 'Flexible Vision',
             paletteLabel:'Configure Camera',
             color: '#de7f7f',
             defaults: {
+                server: {value:"", type:"remote-server"},
                 camlocation: {type: "camera-server", required: true},
                 camera: {value: "", required: true},
                 camprop: {value: "", required: true},
-                propval: {value: "", required: true, inputLabels:camController.getToolTip},
+                propval: {value: "", required: true},
             },
             inputs: 1,
             outputs: 1,
             icon: "outline-visibility-24px.svg",
             label: function () {
                 let parts = [];
-                if (this.camprop != "") parts.push(this.camprop);
-                if (this.propval != "") parts.push(this.propval);
+                if (this.camprop !== "") parts.push(this.camprop);
+                if (this.propval !== "") parts.push(this.propval);
                 if (parts.length === 0) parts.unshift(this._def.paletteLabel);
                 else if (parts.length === 1) parts.unshift("Config");
                 return parts.join(' - ');
             },
-            oneditprepare: function () {
-                console.log("set-camera-config oneditprepare");
+            oneditprepare: () => {
+
+                // console.log(RED.nodes.node.getNode())
+                console.log("set-camera-property oneditprepare", this.camController.getContext(true), this.camController.getContext());
+
+                function handleCameras() {
+                    var host = $('#node-input-camlocation option:selected').text();
+                    if (host && host.indexOf('http') === 0) {
+                        this.camController.setHost(host)
+                        this.camController.loadCameras();
+                    }
+                }
+
+                handleCameras();
+                $('#node-input-camlocation').change((e) => {
+                    handleCameras()
+                })
 
                 $('#node-input-camera').change(async (e) => {
-                    let camId = $(e).val();
-                    console.log("CAM CHANGED: " + camId, $(e).get(0));
-                    if (camId && camId !== '') {
-                        camController.setCam(camId);
-                        await camController.loadCamConfigs()
-                        camController.renderCamProps();
-                    }
+                    let camId = $(e.currentTarget).val();
+                    console.log("CAMERA CHANGED", camId, this.camController.getContext(true), this.camController.getContext());
+                    this.camController.setCam(camId);
+                    await this.camController.loadCamConfigs();
+                    this.camController.renderCamProps();
                 });
 
                 $('#node-input-camprop').change((e) => {
                     let selected = $('#node-input-camprop option:selected');
-                    console.log("CAMPROPs CHANGED", selected);
+                    console.log("CAMPROP CHANGED", selected, this.camController.getContext(true), this.camController.getContext());
                     if (selected.length === 0) {
-                        console.warn("NOTHING SELECTED", e);
-                        return false;
+                        if (this.camprop) {
+                            this.camController.buildPropValField()
+                        }
+                    } else {
+                        this.camController.setProperty(selected.attr('data-parent'), selected.attr('value'))
+                        this.camController.buildPropValField()
                     }
-                    // let toPass = camController.getAllAttributes(selected.get(0));
-                    camController.setProperty(selected.attr('data-parent'), selected.attr('value'))
-                    camController.buildPropValField()
                 });
             }
         });

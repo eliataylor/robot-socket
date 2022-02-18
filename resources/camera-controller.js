@@ -3,7 +3,16 @@ class CameraController {
     constructor(jq) {
         this.$ = jq;
 
-        this.cam = null;
+        this.typeMap = {
+            'Enumerate':{type:'select', nodeName:'select'},
+            'String':{type:'text', nodeName:'input'},
+            'Integer':{type:'number', nodeName:'input'},
+            'Float':{type:'number', nodeName:'input'},
+            'Command':{type:'textarea', nodeName:'textarea'},
+            'Bool':{type:'checkbox', nodeName:'checkbox'}
+        };
+
+        this.camId = null;
         this.camSettings = {};
         this.camProperty = {};
         this.host = null;
@@ -13,43 +22,43 @@ class CameraController {
         this.camPropValSelector = '#node-input-propval';
     }
 
-    async loadCameras(forceReload) {
-        if (!forceReload) {
-            let cameras = localStorage.getItem('flexV-'+this.host+'-Cameras')
-            if (cameras) {
-                cameras = JSON.parse(cameras)
-                this.allCameras = cameras;
-                if (!this.cam) {
-                    this.cam = cameras[0].id;
-                }
-                this.$(this.camSelector).removeClass('loading')
-                return cameras;
+    async camerasCallBack(cameras) {
+        this.allCameras = cameras;
+        this.renderCameras();
+        if (!this.camId) {
+            this.camId = cameras[0].id;
+        } else {
+            console.log("reusing preselected camera: " + this.camId)
+            let camera = cameras.find(c => c.id === this.camId);
+            if (camera) {
+                this.camId = camera.id;
+            } else {
+                console.warn("No Camera Selected Yet", this.getContext(true), this.getContext())
+                this.$(this.camSelector).removeClass('loading').attr('disabled', false)
+                return false;
             }
         }
 
-        this.$(this.camSelector).addClass('loading')
+        // await this.loadCamConfigs();
+        // this.renderCamProps();
+
+        this.$(this.camSelector).removeClass('loading').attr('disabled', false)
+    }
+
+    async loadCameras() {
+        this.$(this.camSelector).addClass('loading').attr('disabled', true)
         // var url = this.host + '/vision/cameras';
         var url = "resources/node-red-contrib-refined-motion/api/cameras.json";
 
         await this.$.ajax({
             url: url,
             dataType: "json"
-        }).done((data) => {
-            console.log("Got Cameras " + data);
-            this.allCameras = data;
-            if (!this.cam) {
-                this.cam = data[0].id;
-            }
-            this.$(this.camSelector).removeClass('loading')
-            localStorage.setItem('flexV-'+this.host+'-Cameras', JSON.stringify(data))
-            return data;
+        }).done(async (cameras) => {
+            console.log("Got Cameras ", cameras);
+            this.camerasCallBack(cameras);
         }).error((err) => {
             console.error("LOAD CAM FAILED", err);
-            if (forceReload === true) {
-                this.allCameras = [];
-                this.cam = null;
-            }
-            this.$(this.camSelector).removeClass('loading')
+            this.$(this.camSelector).removeClass('loading').attr('disabled', false)
             return err; // TODO: display error?
         });
     }
@@ -62,6 +71,7 @@ class CameraController {
                 'text': o.user_defined_name
             }).appendTo(this.camSelector);
         })
+        this.getToolTip()
     }
 
     async loadCamConfigs() {
@@ -69,17 +79,17 @@ class CameraController {
         // var url = this.host + '/api/vision/vision/configTree/' + this.cam;
         let url = "resources/node-red-contrib-refined-motion/api/configTree.json?camId=" + this.cam;
 
-        this.$(this.camPropSelector).addClass('loading');
+        this.$(this.camPropSelector).addClass('loading').attr('disabled', true);
 
         await this.$.ajax({
             url: url,
             dataType: "json"
         }).done(data => {
             this.camSettings = data;
-            this.$(this.camPropSelector).removeClass('loading');
+            this.$(this.camPropSelector).removeClass('loading').attr('disabled', false);
         }).error(err => {
             this.camSettings = {};
-            this.$(this.camPropSelector).removeClass('loading');
+            this.$(this.camPropSelector).removeClass('loading').attr('disabled', false);
             console.error("LOAD CAM CONFIG FAILED", err);
         })
     }
@@ -87,7 +97,7 @@ class CameraController {
     renderCamProps() {
         console.log("Got Config Tree:", this.camSettings);
         let allTypes = {}
-        this.$(this.camPropSelector).html('');
+        this.$(this.camPropSelector).html('<option disabled="true" value="">Select a Property</option>');
         let parents = {};
         for(let parent in this.camSettings) {
             if (!parents[parent]) {
@@ -109,22 +119,22 @@ class CameraController {
                 this.$('<option/>', toPass).appendTo(this.camPropSelector);
             }
         }
-        console.info(allTypes);
+        // console.info(allTypes);
     }
 
     buildPropValField ()  {
-        const typeMap = {
-            'Enumerate':{type:'select', nodeName:'select'},
-            'String':{type:'text', nodeName:'input'},
-            'Integer':{type:'number', nodeName:'input'},
-            'Float':{type:'number', nodeName:'input'},
-            'Command':{type:'textarea', nodeName:'textarea'},
-            'Bool':{type:'checkbox', nodeName:'checkbox'}
-        };
+        if (!this.camProperty || !this.camProperty.type) {
+            return;
+        }
 
-        let config = typeMap[this.camProperty.type];
+        let config = this.typeMap[this.camProperty.type];
 
-        if (this.$(this.camPropValSelector).get(0).nodeName.toLowerCase() !== config.nodeName) {
+        if (this.$(this.camPropValSelector).length === 0) {
+            console.warn("RACE CONDITION!??");
+            return;
+        }
+
+        if (this.$(this.camPropValSelector).prop('nodeName').toLowerCase() !== config.nodeName) {
             // replace element with correct HTML5 element
             const newEl = document.createElement(config.nodeName);
             newEl.setAttribute('type', config.type);
@@ -138,14 +148,19 @@ class CameraController {
         }
         config.value = this.camProperty.value;
         if (this.camProperty.options) {
+            this.$(this.camPropValSelector).html('');
             this.$('<option/>', {text:config.value, value:config.value}).appendTo(this.camPropValSelector)
-            // TODO: loop other options
+            this.camProperty.options.forEach(o => {
+                this.$('<option/>', {text:o, value:o}).appendTo(this.camPropValSelector)
+            })
         }
-        console.log("BUILD ", config, 'from', this.camProperty);
+
+        console.log("buildPropValField ", config, this.camProperty);
 
         for(let c in config) {
             this.$(this.camPropValSelector).attr(c, config[c]);
-        };
+        }
+
         this.getToolTip()
 
     }
@@ -156,7 +171,9 @@ class CameraController {
 
     getToolTip() {
         let html = JSON.stringify(this.camProperty, null, 2);
-        this.$('#camPropertyDesc').html(html)
+        let ctx = JSON.stringify(this.getContext(), null, 2);
+        let htmlCtx = JSON.stringify(this.getContext(true), null, 2);
+        this.$('#camPropertyDesc').html(`<h3>Selected Property</h3><div>${html}</div><h3>Context</h3><div>${ctx}</div><h3>Form Context</h3><div>${htmlCtx}</div>`)
     }
 
     getAllAttributes(el) {
@@ -176,7 +193,24 @@ class CameraController {
     }
 
     setCam(cam) {
-        this.cam = cam;
+        this.camId = cam;
+    }
+
+    getContext(html) {
+        if (html === true) {
+            return {
+                host:$('#node-input-camlocation option:selected').text(),
+                camId:$('#node-input-camera option:selected').val(),
+                camProp:$('#node-input-camprop option:selected').val(),
+                propVal:$('#node-input-propval option:selected').val()
+            }
+        }
+        return {
+            host:this.host,
+            camId:this.camId,
+            camProp:this.camProperty,
+            propVal: this.camProperty.value
+        }
     }
 
 
