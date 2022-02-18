@@ -6,3 +6,10 @@
 
 - EX.
 PORT=3080 node-red ~/flexibleassembly/RobotCommNode/motioncell-flow.json -s ~/flexibleassembly/RobotCommNode/settings-motioncell.js
+
+
+### Deploy
+
+- `sudo docker exec -it nodecreator /bin/bash`
+-  
+
