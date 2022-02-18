@@ -1,6 +1,6 @@
 class CameraController {
 
-    constructor(jq) {
+    constructor(jq, p) {
         this.$ = jq;
 
         this.typeMap = {
@@ -14,15 +14,38 @@ class CameraController {
         this.camSettings = {};
         this.allCameras = [];
 
-        this.host = "";
-        this.camId = "";
+        console.log('PASSED DEFAULTS', p);
+
+        this.host = ""; // parse from config!?!
+        this.camId = p.camId || '';
+        this.camProp = p.camProp || "";
         this.camProperty = {};
-        this.propVal = "";
+        this.propVal = p.propVal || "";
 
         this.camServerSelector = '#node-input-camlocation';
         this.camSelector = '#node-input-camera';
         this.camPropSelector = '#node-input-camprop';
         this.camPropValSelector = '#node-input-propval';
+
+    }
+
+    startListeners() {
+        this.$(this.camServerSelector).change((e) => {
+            this.syncToForm();
+            this.loadCameras();
+        })
+
+        this.$(this.camSelector).change((e) => {
+            this.syncToForm();
+            this.loadCamConfigs();
+        });
+
+        this.$(this.camPropSelector).change((e) => {
+            this.syncToForm();
+            this.buildPropValField()
+        });
+
+        this.loadCameras();
     }
 
     restoreFromLocalStorage() {
@@ -304,26 +327,28 @@ class CameraController {
 
     getContext() {
         const prop = $(this.camPropSelector + ' option:selected');
-        let config = {
+        let form = {
             host:$(this.camServerSelector + ' option:selected').text(),
             camId:$(this.camSelector).val(),
             camProp:prop.val(),
-            propVal:$(this.camPropSelector).val()
+            propVal:$(this.camPropValSelector).val()
         }
-        if (config.camProp && config.camProp.length > 0) {
-            config.camProperty = this.camSettings[prop.attr('data-parent')][config.camProp]
+        if (form.camProp && form.camProp.length > 0) {
+            form.camProperty = this.camSettings[prop.attr('data-parent')][form.camProp]
         }
 
-        return {
-            form: config,
-            ctx: {
-                host: this.host,
-                camId: this.camId,
-                camProperty: this.camProperty,
-                camProp: this.camProp,
-                propVal: this.propVal
-            }
-        }
+        const ctx = {
+            host: this.host,
+            camId: this.camId,
+            camProperty: this.camProperty,
+            camProp: this.camProp,
+            propVal: this.propVal
+        };
+
+        const event = new CustomEvent('updateToolContext', {detail:ctx});
+        document.getElementById("fvCamForm").dispatchEvent(event);
+
+        return {form: form, ctx: ctx}
     }
 
 
