@@ -19,8 +19,6 @@ class CameraController {
         this.camSettings = {};
         this.allCameras = [];
 
-        console.log('PASSED DEFAULTS', p);
-
         this.host = "";
         if (p.camlocation) {
             this.host = this.$(this.camServerSelector + ' option:selected').text();
@@ -29,6 +27,8 @@ class CameraController {
         this.camProp = p.camProp || "";
         this.camProperty = {};
         this.propVal = p.propVal || "";
+
+        console.log('CTR INITALIZED', this.getContext());
 
     }
 
@@ -53,7 +53,7 @@ class CameraController {
 
     restoreFromLocalStorage() {
         if (this.host === "") {
-            console.log("Restore found not host", this)
+            console.warn("Restore found not host", this.getContext())
             return false;
         }
         let key = 'fvenv' + this.host;
@@ -211,7 +211,7 @@ class CameraController {
 
     buildPropValField() {
         if (!this.camProperty || !this.camProperty.type) {
-            console.log('missing camProperty', this.getContext)
+            console.log('missing camProperty', this.getContext())
             return;
         }
 
@@ -349,10 +349,14 @@ class CameraController {
         const ctx = {
             host: this.host,
             camId: this.camId,
-            camProperty: this.camProperty,
             camProp: this.camProp,
-            propVal: this.propVal
+            propVal: this.propVal,
+            camProperty: this.camProperty
         };
+
+        if (JSON.stringify(ctx) !== JSON.stringify(form)) {
+            console.warn("OUT OF SYNC!", ctx, form)
+        }
 
         return {form: form, ctx: ctx}
     }

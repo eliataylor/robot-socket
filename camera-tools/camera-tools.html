@@ -97,23 +97,24 @@
                 if (this.propVal && this.propVal.length > 0) parts.push(this.propVal);
                 if (parts.length === 0) parts.unshift(this._def.paletteLabel);
                 else if (parts.length === 1) parts.unshift("Config");
-                console.log("LABEL: ", {
-                    camlocation: this.camlocation,
-                    camId:this.camId,
-                    camProp:this.camProp,
-                    propVal:this.propVal
-                });
                 return parts.join(' - ');
             },
-            /*  onpaletteremove : function() {
-                document.getElementById("fvCamForm").removeEventListener('updateToolContext');
+            onpaletteremove : function() {
+                document.getElementById("fvCamForm").removeEventListener('updateToolContext', this.setFVContext);
             },
             oneditcancel : function() {
-                document.getElementById("fvCamForm").removeEventListener('updateToolContext');
+                document.getElementById("fvCamForm").removeEventListener('updateToolContext', this.setFVContext);
             },
             oneditsave : function() {
-                document.getElementById("fvCamForm").removeEventListener('updateToolContext');
-            }, */
+                document.getElementById("fvCamForm").removeEventListener('updateToolContext', this.setFVContext);
+            },
+            setFVContext: function(e) {
+                console.log("updateToolContext", e.detail);
+                this.camlocation = e.detail.host
+                this.camId = e.detail.camId
+                this.camProp = e.detail.camProp
+                this.propVal = e.detail.propVal
+            },
             oneditprepare: function() {
                 const camController = new CameraController($, {
                     camlocation: this.camlocation,
@@ -122,13 +123,11 @@
                     propVal:this.propVal
                 })
                 camController.startListeners();
-                document.getElementById("fvCamForm").addEventListener('updateToolContext', (e) => {
-                    console.log("updateToolContext", e.detail);
-                    this.camlocation = e.detail.host
-                    this.camId = e.detail.camId
-                    this.camProp = e.detail.camProp
-                    this.propVal = e.detail.propVal
-                }, false);
+
+                document.getElementById("fvCamForm").addEventListener('updateToolContext',
+                    (e) => this.setFVContext(e) ,
+                    {capture:false, once:true}
+                );
             }
         });
     })();
