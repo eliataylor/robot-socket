@@ -28,6 +28,7 @@ class CameraController {
         this.camProperty = {};
         this.propVal = p.propVal || "";
 
+        this.syncToForm();
         console.log('CTR INITALIZED', this.getContext());
 
     }
@@ -246,7 +247,9 @@ class CameraController {
         }
 
         this.$(this.camPropValSelector).change((e) => {
-            this.syncToForm();
+            // this.syncToForm();
+            this.propVal = this.$(this.camPropValSelector).val();
+
         });
 
         console.log("buildPropValField " + this.propVal);

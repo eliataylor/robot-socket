@@ -99,13 +99,14 @@
                 else if (parts.length === 1) parts.unshift("Config");
                 return parts.join(' - ');
             },
-            onpaletteremove : function() {
+            /*
+            onpaletteremove: function() {
                 document.getElementById("fvCamForm").removeEventListener('updateToolContext', this.setFVContext);
             },
-            oneditcancel : function() {
+            oneditcancel: function() {
                 document.getElementById("fvCamForm").removeEventListener('updateToolContext', this.setFVContext);
             },
-            oneditsave : function() {
+            oneditsave: function() {
                 document.getElementById("fvCamForm").removeEventListener('updateToolContext', this.setFVContext);
             },
             setFVContext: function(e) {
@@ -115,6 +116,7 @@
                 this.camProp = e.detail.camProp
                 this.propVal = e.detail.propVal
             },
+             */
             oneditprepare: function() {
                 const camController = new CameraController($, {
                     camlocation: this.camlocation,
@@ -125,7 +127,14 @@
                 camController.startListeners();
 
                 document.getElementById("fvCamForm").addEventListener('updateToolContext',
-                    (e) => this.setFVContext(e) ,
+//                    (e) => this.setFVContext(e),
+                    (e) => {
+                        console.log("updateToolContext", e.detail);
+                        this.camlocation = e.detail.host
+                        this.camId = e.detail.camId
+                        this.camProp = e.detail.camProp
+                        this.propVal = e.detail.propVal
+                    },
                     {capture:false, once:true}
                 );
             }
