@@ -3,29 +3,32 @@ class CameraController {
     constructor(jq, p) {
         this.$ = jq;
 
+        this.camServerSelector = '#node-input-camlocation';
+        this.camSelector = '#node-input-camera';
+        this.camPropSelector = '#node-input-camprop';
+        this.camPropValSelector = '#node-input-propval';
+
         this.typeMap = {
-            'Enumerate':{type:'select', nodeName:'select'},
-            'String':{type:'text', nodeName:'input'},
-            'Integer':{type:'number', nodeName:'input'},
-            'Float':{type:'number', nodeName:'input'},
-            'Command':{type:'textarea', nodeName:'textarea'},
-            'Bool':{type:'checkbox', nodeName:'checkbox'}
+            'Enumerate': {type: 'select', nodeName: 'select'},
+            'String': {type: 'text', nodeName: 'input'},
+            'Integer': {type: 'number', nodeName: 'input'},
+            'Float': {type: 'number', nodeName: 'input'},
+            'Command': {type: 'textarea', nodeName: 'textarea'},
+            'Bool': {type: 'checkbox', nodeName: 'checkbox'}
         };
         this.camSettings = {};
         this.allCameras = [];
 
         console.log('PASSED DEFAULTS', p);
 
-        this.host = ""; // parse from config!?!
+        this.host = "";
+        if (p.camlocation) {
+            this.host = this.$(this.camServerSelector + ' option:selected').text();
+        }
         this.camId = p.camId || '';
         this.camProp = p.camProp || "";
         this.camProperty = {};
         this.propVal = p.propVal || "";
-
-        this.camServerSelector = '#node-input-camlocation';
-        this.camSelector = '#node-input-camera';
-        this.camPropSelector = '#node-input-camprop';
-        this.camPropValSelector = '#node-input-propval';
 
     }
 
@@ -77,7 +80,7 @@ class CameraController {
         if (env) {
             env = JSON.parse(env);
         } else {
-            env = {allCameras:this.allCameras, allSettings: {}}
+            env = {allCameras: this.allCameras, allSettings: {}}
         }
         if (this.allCameras && this.allCameras.length > 0) {
             env.allCameras = this.allCameras;
@@ -89,14 +92,14 @@ class CameraController {
         localStorage.setItem(key, JSON.stringify(env));
     }
 
-    renderCameras () {
+    renderCameras() {
         this.$(this.camSelector).html('<option value="">Select a Camera</option>');
         this.allCameras.forEach(o => {
-            const toPass =  {'value': o.id, 'text': o.user_defined_name}
+            const toPass = {'value': o.id, 'text': o.user_defined_name}
             if (o.id === this.camId) {
                 toPass.selected = true;
             }
-            this.$('<option/>',toPass).appendTo(this.camSelector);
+            this.$('<option/>', toPass).appendTo(this.camSelector);
         })
         this.$(this.camSelector).removeClass('loading').attr('disabled', false)
         this.getToolTip()
@@ -178,15 +181,15 @@ class CameraController {
         let allTypes = {}
         this.$(this.camPropSelector).html('<option value="">Select a Property</option>');
         let parents = {};
-        for(let parent in this.camSettings) {
+        for (let parent in this.camSettings) {
             if (!parents[parent]) {
                 this.$('<option/>', {
                     'text': parent,
-                    'disabled':true
+                    'disabled': true
                 }).appendTo(this.camPropSelector);
                 parents[parent] = true;
             }
-            for(let selector in this.camSettings[parent]) {
+            for (let selector in this.camSettings[parent]) {
                 allTypes[this.camSettings[parent][selector].type] = selector;
                 var toPass = {}
                 toPass['data-parent'] = parent;
@@ -206,7 +209,7 @@ class CameraController {
         // console.info(allTypes);
     }
 
-    buildPropValField ()  {
+    buildPropValField() {
         if (!this.camProperty || !this.camProperty.type) {
             console.log('missing camProperty', this.getContext)
             return;
@@ -235,9 +238,9 @@ class CameraController {
             this.$(this.camPropValSelector).html('');
             this.camProperty.options.forEach(o => {
                 this.$('<option/>', {
-                    text:o,
-                    value:o,
-                    selected : o === this.propVal
+                    text: o,
+                    value: o,
+                    selected: o === this.propVal
                 }).appendTo(this.camPropValSelector)
             })
         }
@@ -276,46 +279,52 @@ class CameraController {
 
     // like ComponentDidUpdate in react.js
     syncToForm() {
-       let defaults = {
-           host:this.host,
-           camId:this.camId,
-           camProperty:this.camProperty,
-           propVal: this.propVal
-       };
-       let check = $(this.camServerSelector + ' option:selected').text()
-       try {
-           let test = new URL(check);
-           if (check && check.length > 0) {
-               defaults.host = check;
-               this.setHost(check)
-           }
-       } catch(e) {}
+        let defaults = {
+            host: this.host,
+            camId: this.camId,
+            camProperty: this.camProperty,
+            camProp: this.camProp,
+            propVal: this.propVal
+        };
+        let check = this.$(this.camServerSelector + ' option:selected').text()
+        try {
+            let test = new URL(check);
+            if (check && check.length > 0) {
+                defaults.host = check;
+                this.setHost(check)
+            }
+        } catch (e) {
+        }
 
-        check = $(this.camSelector + ' option:selected')
+        check = this.$(this.camSelector + ' option:selected')
         if (check && check.length > 0) {
             defaults.camId = check.attr('value');
             this.setCam(check.attr('value'))
         } else if (defaults.camId) {
-            $(this.camSelector).val(defaults.camId);
+            this.$(this.camSelector).val(defaults.camId);
         }
 
-        check = $(this.camPropSelector + ' option:selected')
+        check = this.$(this.camPropSelector + ' option:selected')
         if (check && check.length > 0) {
             this.setProperty(check.attr('data-parent'), check.attr('value'))
             defaults.camProperty = this.camProperty;
             defaults.camProp = check.attr('value')
         } else if (defaults.camProp && defaults.camProp) {
-            $(this.camPropSelector).val(defaults.camProp)
+            this.$(this.camPropSelector).val(defaults.camProp)
         }
 
-        check = $(this.camPropValSelector).val()
+        check = this.$(this.camPropValSelector).val()
         if (check && check.length > 0) {
             defaults.propVal = check;
             this.propVal = check;
         } else if (defaults.propVal) {
-            $(this.camPropValSelector).val(defaults.propVal)
+            this.$(this.camPropValSelector).val(defaults.propVal)
         }
         console.log(defaults);
+
+        const event = new CustomEvent('updateToolContext', {detail: defaults});
+        document.getElementById("fvCamForm").dispatchEvent(event);
+
         return defaults;
     }
 
@@ -326,12 +335,12 @@ class CameraController {
     }
 
     getContext() {
-        const prop = $(this.camPropSelector + ' option:selected');
+        const prop = this.$(this.camPropSelector + ' option:selected');
         let form = {
-            host:$(this.camServerSelector + ' option:selected').text(),
-            camId:$(this.camSelector).val(),
-            camProp:prop.val(),
-            propVal:$(this.camPropValSelector).val()
+            host: this.$(this.camServerSelector + ' option:selected').text(),
+            camId: this.$(this.camSelector).val(),
+            camProp: prop.val(),
+            propVal: this.$(this.camPropValSelector).val()
         }
         if (form.camProp && form.camProp.length > 0) {
             form.camProperty = this.camSettings[prop.attr('data-parent')][form.camProp]
@@ -344,9 +353,6 @@ class CameraController {
             camProp: this.camProp,
             propVal: this.propVal
         };
-
-        const event = new CustomEvent('updateToolContext', {detail:ctx});
-        document.getElementById("fvCamForm").dispatchEvent(event);
 
         return {form: form, ctx: ctx}
     }
